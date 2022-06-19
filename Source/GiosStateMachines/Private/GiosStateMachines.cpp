@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright MiddleMast. All rights reserved
 
 #include "GiosStateMachines.h"
 

@@ -1,4 +1,4 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Copyright MiddleMast. All rights reserved
 
 #include "State.h"
 

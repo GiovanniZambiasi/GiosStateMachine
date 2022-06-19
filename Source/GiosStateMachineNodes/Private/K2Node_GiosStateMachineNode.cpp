@@ -1,4 +1,6 @@
-﻿#include "K2Node_GiosStateMachineNode.h"
+﻿// Copyright MiddleMast. All rights reserved
+
+#include "K2Node_GiosStateMachineNode.h"
 
 #include "BlueprintActionDatabaseRegistrar.h"
 #include "BlueprintNodeSpawner.h"

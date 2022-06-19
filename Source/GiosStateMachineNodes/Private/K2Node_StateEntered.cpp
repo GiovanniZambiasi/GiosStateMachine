@@ -1,4 +1,6 @@
-﻿#include "K2Node_StateEntered.h"
+﻿// Copyright MiddleMast. All rights reserved
+
+#include "K2Node_StateEntered.h"
 #include "K2Node_Event.h"
 #include "K2Node_SwitchName.h"
 #include "KismetCompiler.h"

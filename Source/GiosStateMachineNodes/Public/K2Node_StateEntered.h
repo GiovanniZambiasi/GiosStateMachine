@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// Copyright MiddleMast. All rights reserved
+
+#pragma once
 
 #include "K2Node_GiosStateMachineNode.h"
 #include "K2Node_StateEntered.generated.h"

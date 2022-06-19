@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿// Copyright MiddleMast. All rights reserved
+
+#pragma once
 
 namespace GiosStateMachineNodes
 {
