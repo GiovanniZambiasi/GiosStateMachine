@@ -4,7 +4,7 @@
 
 #define LOCTEXT_NAMESPACE "FGiosStateMachinesModule"
 
-DEFINE_LOG_CATEGORY(LogGameStates)
+DEFINE_LOG_CATEGORY(LogGiosStateMachines)
 
 void FGiosStateMachinesModule::StartupModule()
 {

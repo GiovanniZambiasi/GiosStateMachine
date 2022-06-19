@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "K2Node_CustomEvent.h"
-#include "K2Node_GameStatesNode.h"
+#include "K2Node_GiosStateMachineNode.h"
 #include "K2Node_EnterState.generated.h"
 
 class UEdGraphSchema_K2;
 class UK2Node_CustomEvent;
 
 UCLASS()
-class GIOSSTATEMACHINENODES_API UK2Node_EnterState : public UK2Node_GameStatesNode
+class GIOSSTATEMACHINENODES_API UK2Node_EnterState : public UK2Node_GiosStateMachineNode
 {
 	GENERATED_BODY()
 

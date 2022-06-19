@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-namespace GameStates
+namespace GiosStateMachineNodes
 {
 	const FText CategoryName = FText::FromString("Gio's StateMachines");
 }

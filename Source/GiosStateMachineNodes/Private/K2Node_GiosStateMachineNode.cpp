@@ -1,11 +1,11 @@
-﻿#include "K2Node_GameStatesNode.h"
+﻿#include "K2Node_GiosStateMachineNode.h"
 
 #include "BlueprintActionDatabaseRegistrar.h"
 #include "BlueprintNodeSpawner.h"
 
 #define LOCTEXT_NAMESPACE "UK2Node_GameStatesNode"
 
-void UK2Node_GameStatesNode::GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const
+void UK2Node_GiosStateMachineNode::GetMenuActions(FBlueprintActionDatabaseRegistrar& ActionRegistrar) const
 {
 	Super::GetMenuActions(ActionRegistrar);
 

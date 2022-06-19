@@ -1,12 +1,12 @@
 ﻿#pragma once
 
-#include "K2Node_GameStatesNode.h"
+#include "K2Node_GiosStateMachineNode.h"
 #include "K2Node_StateEntered.generated.h"
 
 class UState;
 
 UCLASS()
-class GIOSSTATEMACHINENODES_API UK2Node_StateEntered : public UK2Node_GameStatesNode
+class GIOSSTATEMACHINENODES_API UK2Node_StateEntered : public UK2Node_GiosStateMachineNode
 {
 	GENERATED_BODY()
 	

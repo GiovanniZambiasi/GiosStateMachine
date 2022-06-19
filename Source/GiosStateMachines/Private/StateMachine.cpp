@@ -8,7 +8,7 @@
 
 void UStateMachine::Begin()
 {
-	LOG_GAME_STATES(Display, TEXT("State machine begin"))
+	LOG_GIOS_STATEMACHINES(Display, TEXT("State machine begin"))
 	OnBegin();
 }
 
@@ -19,7 +19,7 @@ void UStateMachine::EnterState(UClass* StateClass, FName Input, const FStateExit
 		return;
 	}
 
-	LOG_GAME_STATES(Display, TEXT("%s entering state %s"), *GetName(), *StateClass->GetName());
+	LOG_GIOS_STATEMACHINES(Display, TEXT("%s entering state %s"), *GetName(), *StateClass->GetName());
 	
 	StateExitHandler = ExitHandler;
 	
@@ -30,6 +30,6 @@ void UStateMachine::EnterState(UClass* StateClass, FName Input, const FStateExit
 
 void UStateMachine::HandleStateExitRequest(const FName& Output)
 {
-	LOG_GAME_STATES(Display, TEXT("StateMachine received exit request through %s"), *Output.ToString());
+	LOG_GIOS_STATEMACHINES(Display, TEXT("StateMachine received exit request through %s"), *Output.ToString());
 	StateExitHandler.Execute(Output);
 }

@@ -6,7 +6,7 @@
 
 void UState::Enter(const FName& Input)
 {
-	LOG_GAME_STATES(Display, TEXT("%s entered via '%s'"), *GetName(), *Input.ToString());
+	LOG_GIOS_STATEMACHINES(Display, TEXT("%s entered via '%s'"), *GetName(), *Input.ToString());
 	OnEntered(Input);
 }
 
@@ -24,6 +24,6 @@ void UState::SetOutputs(const TArray<FName>& OutputNames)
 
 void UState::RequestExit(const FName& Output)
 {
-	LOG_GAME_STATES(Display, TEXT("%s requesting exit from %s"), *GetName(), *Output.ToString())
+	LOG_GIOS_STATEMACHINES(Display, TEXT("%s requesting exit from %s"), *GetName(), *Output.ToString())
 	ExitRequestedEvent.Broadcast(Output);
 }

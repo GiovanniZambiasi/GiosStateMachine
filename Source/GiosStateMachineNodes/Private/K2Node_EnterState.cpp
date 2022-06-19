@@ -33,7 +33,7 @@ void UK2Node_EnterState::ReallocatePinsDuringReconstruction(TArray<UEdGraphPin*>
 {
 	Super::ReallocatePinsDuringReconstruction(OldPins);
 
-	LOG_GAME_STATES(Display, TEXT("Reallocating during reconstruction for %s..."), *GetName())
+	LOG_GIOS_STATEMACHINES(Display, TEXT("Reallocating during reconstruction for %s..."), *GetName())
 	
 	const auto* OldClassPin = *OldPins.FindByPredicate([](UEdGraphPin* Pin){ return Pin->GetFName() == ClassPinName; });
 
@@ -52,7 +52,7 @@ void UK2Node_EnterState::PinDefaultValueChanged(UEdGraphPin* Pin)
 
 	if (Pin->GetFName() == ClassPinName)
 	{
-		LOG_GAME_STATES(Display, TEXT("Reconstructing from DefaultValueChanged..."))
+		LOG_GIOS_STATEMACHINES(Display, TEXT("Reconstructing from DefaultValueChanged..."))
 		ReconstructNode();
 	}
 }
@@ -61,7 +61,7 @@ void UK2Node_EnterState::RefreshInputAndOutputPins()
 {
 	const auto* Class = Cast<UClass>(GetClassPin()->DefaultObject);
 
-	LOG_GAME_STATES(Display, TEXT("Refreshing inputs and outputs for %s"), Class != nullptr? *Class->GetName() : TEXT("NONE"))
+	LOG_GIOS_STATEMACHINES(Display, TEXT("Refreshing inputs and outputs for %s"), Class != nullptr? *Class->GetName() : TEXT("NONE"))
 	
 	if (Class != nullptr && Class->ClassDefaultObject != nullptr)
 	{
