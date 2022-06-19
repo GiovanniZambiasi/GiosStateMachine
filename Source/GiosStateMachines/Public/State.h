@@ -15,10 +15,10 @@ class GIOSSTATEMACHINES_API UState : public UObject
 private:
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Gio's StateMachines")
 	TArray<FName> Inputs = { "Default" };
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Gio's StateMachines")
 	TArray<FName> Outputs = { "Default" };
 
 	FStateExitRequestHandler ExitRequestedEvent{};

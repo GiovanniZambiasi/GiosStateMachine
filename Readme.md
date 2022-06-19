@@ -1,0 +1,15 @@
+﻿# Gio's StateMachines
+
+A blueprint-friendly framework for implementing ``StateMachines`` within *Unreal Engine*.
+
+# To do
+- [X] Persistence
+- [X] ``StateEnter`` node
+- [ ] ``RequestExit`` node
+- [ ] When ``UClass`` updates, refresh nodes
+- [ ] ``StateMachineData``
+- [ ] Nested ``StateMachines``
+- [ ] ``StateMachineComponent``
+- [ ] Double-click targets
+- [ ] State history and ``Return``
+- [ ] Protected name validation (PN_Exec, PN_Then)
