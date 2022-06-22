@@ -33,12 +33,11 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnEntered(const FName& Input);
+
+	UFUNCTION(BlueprintCallable)
+	void RequestExit(FName Output);
 	
 protected:
-	
-	UFUNCTION(BlueprintCallable)
-	void RequestExit(const FName& Output);
-	
 	void AddInputs(const TArray<FName>& InputNames)	{ Inputs.Append(InputNames); }
 
 	void AddOutputs(const TArray<FName>& OutputNames)	{ Outputs.Append(OutputNames); }

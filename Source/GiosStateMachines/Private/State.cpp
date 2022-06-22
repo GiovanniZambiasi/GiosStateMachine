@@ -22,7 +22,7 @@ void UState::SetOutputs(const TArray<FName>& OutputNames)
 	Outputs.Append(OutputNames);
 }
 
-void UState::RequestExit(const FName& Output)
+void UState::RequestExit(FName Output)
 {
 	LOG_GIOS_STATEMACHINES(Display, TEXT("%s requesting exit from %s"), *GetName(), *Output.ToString())
 	ExitRequestedEvent.Broadcast(Output);

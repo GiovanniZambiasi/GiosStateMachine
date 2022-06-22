@@ -10,6 +10,10 @@ A blueprint-friendly framework for implementing ``StateMachines`` within *Unreal
 - [ ] ``StateMachineData``
 - [ ] Nested ``StateMachines``
 - [ ] ``StateMachineComponent``
-- [ ] Double-click targets
+- [ ] Double-click targets~~~~
 - [ ] State history and ``Return``
 - [ ] Protected name validation (PN_Exec, PN_Then)
+- [ ] Examples
+  - [ ] Dialogue
+  - [ ] UI Flow
+  - [ ] Actor states

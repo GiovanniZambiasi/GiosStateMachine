@@ -2,13 +2,13 @@
 
 #pragma once
 
-#include "K2Node_GiosStateMachineNode.h"
+#include "K2Node_StateNode.h"
 #include "K2Node_StateEntered.generated.h"
 
 class UState;
 
 UCLASS()
-class GIOSSTATEMACHINENODES_API UK2Node_StateEntered : public UK2Node_GiosStateMachineNode
+class GIOSSTATEMACHINENODES_API UK2Node_StateEntered : public UK2Node_StateNode
 {
 	GENERATED_BODY()
 	
@@ -24,9 +24,7 @@ public:
 	virtual void ExpandNode(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
 
 private:
-	void AllocatePinsForState(const UState* State);
-
-	UState* GetDefaultStateObject() const;
+	void AllocateInputPins(const UState* State);
 
 	TArray<UEdGraphPin*> GetInputPins();
 };

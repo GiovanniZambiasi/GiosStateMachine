@@ -15,11 +15,11 @@ void UK2Node_StateEntered::AllocateDefaultPins()
 	
 	if(const auto* State = GetDefaultStateObject())
 	{
-	 	AllocatePinsForState(State);
+	 	AllocateInputPins(State);
 	}
 }
 
-void UK2Node_StateEntered::AllocatePinsForState(const UState* State)
+void UK2Node_StateEntered::AllocateInputPins(const UState* State)
 {
 	auto Inputs = State->GetInputs();
 
@@ -27,18 +27,6 @@ void UK2Node_StateEntered::AllocatePinsForState(const UState* State)
 	{
 		CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, Input);
 	}
-}
-
-UState* UK2Node_StateEntered::GetDefaultStateObject() const
-{
-	auto Class = GetBlueprint()->GeneratedClass;
-	
-	if(!Class)
-	{
-		return nullptr;
-	}
-	
-	return Cast<UState>(Class->ClassDefaultObject);
 }
 
 TArray<UEdGraphPin*> UK2Node_StateEntered::GetInputPins()
