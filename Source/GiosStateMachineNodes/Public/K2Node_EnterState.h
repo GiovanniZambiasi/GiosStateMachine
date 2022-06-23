@@ -31,6 +31,8 @@ public:
 	virtual void ExpandNode(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
 
 	virtual bool IsNodeSafeToIgnore() const override { return true; }
+
+	virtual UObject* GetJumpTargetForDoubleClick() const override;
 	
 private:
 	void RefreshInputAndOutputPins();

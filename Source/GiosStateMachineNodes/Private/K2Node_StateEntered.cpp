@@ -35,15 +35,18 @@ TArray<UEdGraphPin*> UK2Node_StateEntered::GetInputPins()
 
 	for	(auto* Pin : this->Pins)
 	{
-		if(Pin->Direction != EGPD_Output || Pin->GetFName() == UEdGraphSchema_K2::PN_Then || Pin->PinType.PinCategory != UEdGraphSchema_K2::PC_Exec)
+		if(IsStateInputPin(Pin))
 		{
-			continue;
+			InputPins.Add(Pin);
 		}
-
-		InputPins.Add(Pin);
 	}
 	
 	return InputPins;
+}
+
+bool UK2Node_StateEntered::IsStateInputPin(const UEdGraphPin* Pin) const
+{
+	return Pin->Direction == EGPD_Output || Pin->GetFName() != UEdGraphSchema_K2::PN_Then || Pin->PinType.PinCategory == UEdGraphSchema_K2::PC_Exec;
 }
 
 void UK2Node_StateEntered::ExpandNode(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
@@ -105,6 +108,36 @@ void UK2Node_StateEntered::ExpandNode(FKismetCompilerContext& CompilerContext, U
 	}
 
 	BreakAllNodeLinks();
+}
+
+void UK2Node_StateEntered::ValidateNodeDuringCompilation(FCompilerResultsLog& MessageLog) const
+{
+	Super::ValidateNodeDuringCompilation(MessageLog);
+	
+	auto InputPins = Pins.FilterByPredicate([&](UEdGraphPin* Pin){ return IsStateInputPin(Pin); });
+	auto StateDefault = GetDefaultStateObject();
+
+	if(!StateDefault)
+	{
+		return;
+	}
+
+	auto InputNames = StateDefault->GetInputs();
+	
+	if(InputPins.Num() != InputNames.Num())
+	{
+		MessageLog.Error(*FString::Printf(TEXT("Invalid number of pins '%i'. Amount should be '%i'. Try refreshing node"), InputPins.Num(), InputNames.Num()));
+		return;
+	}
+
+	for (auto InputName : InputNames)
+	{
+		if(!InputPins.ContainsByPredicate([&](UEdGraphPin* Pin){ return Pin->GetFName() == InputName; }))
+		{
+			MessageLog.Error(TEXT("Input pin not found with name '%s'. Try refreshing node"), *InputName.ToString());
+			return;
+		}
+	}
 }
 
 #undef LOCTEXT_NAMESPACE

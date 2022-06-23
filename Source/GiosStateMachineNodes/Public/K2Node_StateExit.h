@@ -22,10 +22,14 @@ public:
 
 	virtual void ExpandNode(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph) override;
 
+	virtual void ValidateNodeDuringCompilation(FCompilerResultsLog& MessageLog) const override;
+	
 private:
 	void AllocateOutputPins(const UState* State);
 
 	void ExpandOutputPin(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph, UEdGraphPin* Pin);
 
 	TArray<UEdGraphPin*> GetOutputPins();
+
+	bool IsStateOutputPin(const UEdGraphPin* Pin) const;
 };
