@@ -11,7 +11,6 @@ DECLARE_EVENT_OneParam(UState, FStateExitRequestHandler, const FName& /*Requeste
 UCLASS(Blueprintable)
 class GIOSSTATEMACHINES_API UState : public UObject
 {
-private:
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, Category="Gio's StateMachines")
@@ -23,21 +22,23 @@ private:
 	FStateExitRequestHandler ExitRequestedEvent{};
 	
 public:
+	FStateExitRequestHandler& OnExitRequested() { return ExitRequestedEvent; }
+	
 	virtual void Enter(const FName& Input);
+	
+	virtual void Tick(const float& DeltaTime);
 
+	UFUNCTION(BlueprintCallable)
+	virtual void RequestExit(FName Output);
+	
 	const TArray<FName>& GetInputs() const { return Inputs; }
 	
 	const TArray<FName>& GetOutputs() const { return Outputs; }
 
-	FStateExitRequestHandler& OnExitRequested() { return ExitRequestedEvent; }
-
+protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnEntered(const FName& Input);
-
-	UFUNCTION(BlueprintCallable)
-	void RequestExit(FName Output);
 	
-protected:
 	void AddInputs(const TArray<FName>& InputNames)	{ Inputs.Append(InputNames); }
 
 	void AddOutputs(const TArray<FName>& OutputNames)	{ Outputs.Append(OutputNames); }

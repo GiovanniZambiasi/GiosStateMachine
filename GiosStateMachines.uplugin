@@ -24,6 +24,11 @@
 			"Name": "GiosStateMachineNodes",
 			"Type": "UncookedOnly",
 			"LoadingPhase": "PostEngineInit"
+		},
+		{
+			"Name": "GiosStateMachineTests",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		}
 	]
 }

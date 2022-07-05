@@ -190,10 +190,10 @@ void UK2Node_EnterState::ExpandInputPin(FKismetCompilerContext& CompilerContext,
 	static const FName StateClassParamName = TEXT("StateClass");
 	static const FName InputParamName = TEXT("Input");
 	static const FName StateExitRequestHandlerParamName = TEXT("ExitHandler");
+	static const FName EnterStateFunctionName = TEXT("EnterState");
 
 	auto* CallNode = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(this, SourceGraph);
-	const auto FunctionName = GET_FUNCTION_NAME_CHECKED(UStateMachine, EnterState);
-	const auto* Function = CompilerContext.NewClass->FindFunctionByName(FunctionName);
+	const auto* Function = CompilerContext.NewClass->FindFunctionByName(EnterStateFunctionName);
 
 	CompilerContext.MessageLog.NotifyIntermediateObjectCreation(CallNode, this);
 
@@ -201,7 +201,7 @@ void UK2Node_EnterState::ExpandInputPin(FKismetCompilerContext& CompilerContext,
 	{
 		CompilerContext.MessageLog.Error(
 			TEXT("No function named '%s' found in class %s. This node can only be added to %s objects"),
-			*FunctionName.ToString(), *CompilerContext.NewClass->GetName(), *UStateMachine::StaticClass()->GetName());
+			*EnterStateFunctionName.ToString(), *CompilerContext.NewClass->GetName(), *UStateMachine::StaticClass()->GetName());
 
 		return;
 	}

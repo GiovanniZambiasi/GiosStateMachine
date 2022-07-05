@@ -1,10 +1,10 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
 
-public class GiosStateMachines : ModuleRules
+public class GiosStateMachineTests : ModuleRules
 {
-	public GiosStateMachines(ReadOnlyTargetRules Target) : base(Target)
+	public GiosStateMachineTests(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 		
@@ -12,8 +12,9 @@ public class GiosStateMachines : ModuleRules
 			new string[]
 			{
 				"Core",
+				"GiosStateMachines",
 			}
-			);
+		);
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
@@ -21,8 +22,8 @@ public class GiosStateMachines : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Slate",
-				"SlateCore",
+				"SlateCore",	
 			}
-			);
+		);
 	}
 }

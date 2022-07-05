@@ -5,10 +5,10 @@
 #include "State.h"
 #include "GiosStateMachines.h"
 
-void UStateMachine::Begin()
+void UStateMachine::Run()
 {
-	LOG_GIOS_STATEMACHINES(Display, TEXT("State machine begin"))
-	OnBegin();
+	LOG_GIOS_STATEMACHINES(Display, TEXT("State machine running"))
+	OnRun();
 }
 
 void UStateMachine::EnterState(UClass* StateClass, FName Input, const FStateExitHandler& ExitHandler)
@@ -25,6 +25,14 @@ void UStateMachine::EnterState(UClass* StateClass, FName Input, const FStateExit
 	CurrentState = NewObject<UState>(this, StateClass);
 	CurrentState->OnExitRequested().AddUObject(this, &ThisClass::HandleStateExitRequest);
 	CurrentState->Enter(Input);
+}
+
+void UStateMachine::Tick(const float& DeltaTime)
+{
+	if(CurrentState)
+	{
+		CurrentState->Tick(DeltaTime);
+	}
 }
 
 void UStateMachine::HandleStateExitRequest(const FName& Output)

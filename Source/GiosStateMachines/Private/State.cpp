@@ -27,3 +27,7 @@ void UState::RequestExit(FName Output)
 	LOG_GIOS_STATEMACHINES(Display, TEXT("%s requesting exit from %s"), *GetName(), *Output.ToString())
 	ExitRequestedEvent.Broadcast(Output);
 }
+
+void UState::Tick(const float& DeltaTime)
+{
+}

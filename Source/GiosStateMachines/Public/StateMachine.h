@@ -22,14 +22,19 @@ class GIOSSTATEMACHINES_API UStateMachine : public UObject
 	
 public:
 	UFUNCTION(BlueprintCallable)
-	void Begin();
+	void Run();
+	
+	void Tick(const float& DeltaTime);
 
+	UState* GetCurrentState() const { return CurrentState; }
+	
+protected:
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnBegin();
+	void OnRun();
 	
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly)
 	void EnterState(UClass* StateClass, FName Input, const FStateExitHandler& ExitHandler);
-
+	
 private:
 	void HandleStateExitRequest(const FName& Output);
 };
