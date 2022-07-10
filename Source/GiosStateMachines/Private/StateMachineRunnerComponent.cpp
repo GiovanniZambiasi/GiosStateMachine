@@ -17,6 +17,11 @@ void UStateMachineRunnerComponent::BeginPlay()
 	StateMachine = CreateStateMachine();
 	checkf(StateMachine, TEXT("%s's 'CreateStateMachine' function did not create a valid state machine. Make sure to set the StateMachineClass"), *GetName())
 	StateMachine->Run();
+
+	FSoftObjectPath ResourceRef(TEXT("Blueprint'/GiosStateMachines/Tests/Transition/BP_TransitionTestStateMachine.BP_TransitionTestStateMachine'"));
+	auto Resource = ResourceRef.TryLoad();
+	//auto Resource = LoadObject<UStateMachine>(GetTransientPackage(), TEXT("/GiosStateMachines/Tests/Transition/BP_TransitionTestStateMachine.BP_TransitionTestStateMachine"));
+	UE_LOG(LogTemp, Display, TEXT("Found resource via path?! %s"), Resource != nullptr ? TEXT("YES!") : TEXT("No :(") )
 }
 
 UStateMachine* UStateMachineRunnerComponent::CreateStateMachine()

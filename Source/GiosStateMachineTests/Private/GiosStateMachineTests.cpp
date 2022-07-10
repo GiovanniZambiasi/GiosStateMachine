@@ -11,3 +11,5 @@ IMPLEMENT_MODULE(FDefaultModuleImpl, GiosStateMachineTests)void FGioTestUtils::E
 		TargetPC->ConsoleCommand(TEXT("Exit"), true);
 	}
 }
+
+const FString FGioTestUtils::EmptyTestSceneName{TEXT("/GiosStateMachines/Tests/Transition/StateMachinetest")};
