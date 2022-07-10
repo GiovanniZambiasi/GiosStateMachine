@@ -98,6 +98,26 @@ void FStateMachineTests::Define()
 
 		TestEqual(TEXT("State is B"), CurrentState->GetName(), FString{TEXT("BP_StateB")});
 	});
+	
+	It(TEXT("GivenStateMachine_WhenExitThroughInvalidOutput_LogsWarning"), [this]
+	{
+		auto* StateMachineResource = LoadStateMachineResource(TransitionTestStateMachinePath);
+
+		if (!TestNotNull(TEXT("State machine resource found"), StateMachineResource))
+			return;
+
+		auto* StateMachine = NewObject<UStateMachine>(StateMachineResource);
+
+		if (TestNotNull(TEXT("State machine is not null"), StateMachine))
+			return;
+
+		StateMachine->Run();
+
+		AddExpectedError(TEXT("no transition was made"), EAutomationExpectedErrorFlags::Contains);
+		
+		auto* InitialState = StateMachine->GetCurrentState();
+		InitialState->RequestExit(TEXT("B"));
+	});
 
 	AfterEach([this]
 	{
