@@ -1,7 +1,9 @@
 ﻿#include "EngineUtils.h"
+#include "GiosStateMachines.h"
 #include "GiosStateMachineTests.h"
 #include "State.h"
 #include "StateMachine.h"
+#include "StateMachineRunnerComponent.h"
 #include "Engine/AssetManager.h"
 #include "Misc/AutomationTest.h"
 #include "Tests/AutomationCommon.h"
@@ -10,6 +12,7 @@ BEGIN_DEFINE_SPEC(FStateMachineTests, TEXT("State Machine Tests"),
                   EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
 
 	UWorld* Map;
+	UStateMachineRunnerComponent* StateMachineRunner;
 
 	void LoadMap(const FString& MapPath)
 	{
@@ -44,79 +47,125 @@ BEGIN_DEFINE_SPEC(FStateMachineTests, TEXT("State Machine Tests"),
 		return FGioTestUtils::CastResource<UStateMachine>(Resource);
 	}
 
+	bool LoadAndRunStateMachine(const FString& ResourcePath)
+	{
+		auto* StateMachineResource = LoadStateMachineResource(ResourcePath);
+
+		if (TestNotNull(TEXT("State machine resource is not null"), StateMachineResource))
+		{
+			StateMachineRunner->RunStateMachine(StateMachineResource->GetClass());
+			return true;
+		}
+
+		return false;
+	}
+
 END_DEFINE_SPEC(FStateMachineTests)
 
-const FString TransitionTestStateMachinePath = TEXT("Blueprint'/GiosStateMachines/Tests/Transition/BP_TransitionTestStateMachine.BP_TransitionTestStateMachine'");
+const FString TransitionTestStateMachinePath = TEXT(
+	"Blueprint'/GiosStateMachines/Tests/Transition/BP_TransitionTestStateMachine.BP_TransitionTestStateMachine'");
 
 void FStateMachineTests::Define()
 {
 	BeforeEach([this]
 	{
 		LoadMap(FGioTestUtils::EmptyTestSceneName);
+
+		auto* Actor = Map->SpawnActor<AActor>();
+		StateMachineRunner = Cast<UStateMachineRunnerComponent>(
+			Actor->AddComponentByClass(UStateMachineRunnerComponent::StaticClass(), false, FTransform{}, true));
 	});
 
 	It(TEXT("GivenStateMachine_WhenExitThroughA_EntersStateA"), [this]
 	{
-		auto* StateMachineResource = LoadStateMachineResource(TransitionTestStateMachinePath);
-
-		if (!TestNotNull(TEXT("State machine resource found"), StateMachineResource))
+		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
+		{
 			return;
+		}
 
-		auto* StateMachine = NewObject<UStateMachine>(StateMachineResource);
-
-		if (TestNotNull(TEXT("State machine is not null"), StateMachine))
-			return;
-
-		StateMachine->Run();
+		auto* StateMachine = StateMachineRunner->GetStateMachine();
 
 		auto* InitialState = StateMachine->GetCurrentState();
 		InitialState->RequestExit(TEXT("A"));
 
 		auto* CurrentState = StateMachine->GetCurrentState();
 
-		TestEqual(TEXT("State is A"), CurrentState->GetName(), FString{TEXT("BP_StateA")});
+		TestEqual(TEXT("State is A"), CurrentState->GetClass()->GetName(), FString{TEXT("BP_StateA_C")});
 	});
 
 	It(TEXT("GivenStateMachine_WhenExitThroughB_EntersStateB"), [this]
 	{
-		auto* StateMachineResource = LoadStateMachineResource(TransitionTestStateMachinePath);
-
-		if (!TestNotNull(TEXT("State machine resource found"), StateMachineResource))
+		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
+		{
 			return;
+		}
 
-		auto* StateMachine = NewObject<UStateMachine>(StateMachineResource);
-
-		if (TestNotNull(TEXT("State machine is not null"), StateMachine))
-			return;
-
-		StateMachine->Run();
+		auto* StateMachine = StateMachineRunner->GetStateMachine();
 
 		auto* InitialState = StateMachine->GetCurrentState();
 		InitialState->RequestExit(TEXT("B"));
 
 		auto* CurrentState = StateMachine->GetCurrentState();
 
-		TestEqual(TEXT("State is B"), CurrentState->GetName(), FString{TEXT("BP_StateB")});
+		TestEqual(TEXT("State is B"), CurrentState->GetClass()->GetName(), FString{TEXT("BP_StateB_C")});
 	});
-	
+
 	It(TEXT("GivenStateMachine_WhenExitThroughInvalidOutput_LogsWarning"), [this]
 	{
-		auto* StateMachineResource = LoadStateMachineResource(TransitionTestStateMachinePath);
-
-		if (!TestNotNull(TEXT("State machine resource found"), StateMachineResource))
+		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
+		{
 			return;
+		}
 
-		auto* StateMachine = NewObject<UStateMachine>(StateMachineResource);
+		auto* StateMachine = StateMachineRunner->GetStateMachine();
 
-		if (TestNotNull(TEXT("State machine is not null"), StateMachine))
-			return;
+		AddExpectedError(TEXT("Output 'C' not present"), EAutomationExpectedErrorFlags::Contains);
 
-		StateMachine->Run();
-
-		AddExpectedError(TEXT("no transition was made"), EAutomationExpectedErrorFlags::Contains);
-		
 		auto* InitialState = StateMachine->GetCurrentState();
-		InitialState->RequestExit(TEXT("B"));
+		InitialState->RequestExit(TEXT("C"));
+	});
+
+	It(TEXT("GivenStateMachine_WhenRan_CreatesDataObject"), [this]
+	{
+		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
+		{
+			return;
+		}
+
+		auto* StateMachine = StateMachineRunner->GetStateMachine();
+
+		TestNotNull(TEXT("StateMachineData is not null"), StateMachine->GetData());
+	});
+
+	It(TEXT("GivenStateMachine_WhenRan_SetDataOnState"), [this]
+	{
+		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
+		{
+			return;
+		}
+
+		auto* StateMachine = StateMachineRunner->GetStateMachine();
+
+		auto* InitialState = StateMachine->GetCurrentState();
+
+		TestNotNull(TEXT("StateMachineData is not null"), InitialState->GetData());
+	});
+
+	It(TEXT("GivenStateMachine_WhenTransitions_SetDataOnNewState"), [this]
+	{
+		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
+		{
+			return;
+		}
+
+		auto* StateMachine = StateMachineRunner->GetStateMachine();
+
+		auto* InitialState = StateMachine->GetCurrentState();
+		InitialState->RequestExit(TEXT("A"));
+
+		auto* NewState = StateMachine->GetCurrentState();
+
+		TestNotNull(TEXT("StateMachineData is not null"), NewState->GetData());
 	});
 
 	AfterEach([this]

@@ -6,6 +6,8 @@
 #include "UObject/NoExportTypes.h"
 #include "State.generated.h"
 
+class UStateMachineData;
+
 DECLARE_EVENT_OneParam(UState, FStateExitRequestHandler, const FName& /*RequestedOutput*/)
 
 UCLASS(Blueprintable)
@@ -19,10 +21,15 @@ class GIOSSTATEMACHINES_API UState : public UObject
 	UPROPERTY(EditDefaultsOnly, Category="Gio's StateMachines")
 	TArray<FName> Outputs = { "Default" };
 
+	UPROPERTY()
+	UStateMachineData* StateMachineData = nullptr;
+	
 	FStateExitRequestHandler ExitRequestedEvent{};
 	
 public:
 	FStateExitRequestHandler& OnExitRequested() { return ExitRequestedEvent; }
+
+	virtual void SetData(UStateMachineData* Data);
 	
 	virtual void Enter(const FName& Input);
 	
@@ -35,6 +42,8 @@ public:
 	
 	const TArray<FName>& GetOutputs() const { return Outputs; }
 
+	UStateMachineData* GetData() const { return StateMachineData; }
+	
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnEntered(const FName& Input);

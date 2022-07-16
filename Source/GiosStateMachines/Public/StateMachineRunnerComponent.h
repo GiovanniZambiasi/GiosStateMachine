@@ -24,11 +24,10 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UStateMachine* GetStateMachine() const { return StateMachine; }
+	virtual void RunStateMachine(TSubclassOf<UStateMachine> Class);
 	
+	UStateMachine* GetStateMachine() const { return StateMachine; }
+
 protected:
 	virtual void BeginPlay() override;
-
-	virtual UStateMachine* CreateStateMachine();
-	
 };

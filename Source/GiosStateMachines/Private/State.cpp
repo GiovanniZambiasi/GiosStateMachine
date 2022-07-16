@@ -4,6 +4,11 @@
 
 #include "GiosStateMachines.h"
 
+void UState::SetData(UStateMachineData* Data)
+{
+	StateMachineData = Data;
+}
+
 void UState::Enter(const FName& Input)
 {
 	LOG_GIOS_STATEMACHINES(Display, TEXT("%s entered via '%s'"), *GetName(), *Input.ToString());

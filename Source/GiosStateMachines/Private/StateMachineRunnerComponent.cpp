@@ -2,6 +2,8 @@
 
 #include "StateMachineRunnerComponent.h"
 
+#include "GiosStateMachines.h"
+#include "State.h"
 #include "StateMachine.h"
 
 UStateMachineRunnerComponent::UStateMachineRunnerComponent()
@@ -14,15 +16,12 @@ void UStateMachineRunnerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StateMachine = CreateStateMachine();
-	checkf(StateMachine, TEXT("%s's 'CreateStateMachine' function did not create a valid state machine. Make sure to set the StateMachineClass"), *GetNameSafe(GetOwner()))
-	StateMachine->Run();
-}
-
-UStateMachine* UStateMachineRunnerComponent::CreateStateMachine()
-{
-	auto* Machine = NewObject<UStateMachine>(this, StateMachineClass);
-	return Machine;
+	LOG_GIOS_STATEMACHINES(Display, TEXT("Component beginplay"))
+	
+	if(StateMachineClass != nullptr)
+	{
+		RunStateMachine(StateMachineClass);
+	}
 }
 
 void UStateMachineRunnerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -35,3 +34,9 @@ void UStateMachineRunnerComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	}
 }
 
+void UStateMachineRunnerComponent::RunStateMachine(TSubclassOf<UStateMachine> Class)
+{
+	StateMachine = NewObject<UStateMachine>(this, Class);
+	checkf(StateMachine, TEXT("%s's 'CreateStateMachine' function did not create a valid state machine. Make sure to set the StateMachineClass"), *GetNameSafe(GetOwner()))
+	StateMachine->Run();
+}

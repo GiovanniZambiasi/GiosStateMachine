@@ -7,23 +7,31 @@
 
 void UStateMachine::Run()
 {
+	if(StateMachineData == nullptr)
+	{
+		SetData(CreateData());
+	}
+	
 	LOG_GIOS_STATEMACHINES(Display, TEXT("State machine running"))
+	
 	OnRun();
 }
 
 void UStateMachine::EnterState(UClass* StateClass, FName Input, const FStateExitHandler& ExitHandler)
 {
+	LOG_GIOS_STATEMACHINES(Display, TEXT("%s entering state %s"), *GetName(), *StateClass->GetName());
+	
 	if(!ensureMsgf(StateClass->IsChildOf(UState::StaticClass()), TEXT("'%s' is not a subclass of '%s'. Cannot enter state"), *StateClass->GetName(), *UState::StaticClass()->GetName()))
 	{
 		return;
 	}
 
-	LOG_GIOS_STATEMACHINES(Display, TEXT("%s entering state %s"), *GetName(), *StateClass->GetName());
-	
 	StateExitHandler = ExitHandler;
 	
 	CurrentState = NewObject<UState>(this, StateClass);
 	CurrentState->OnExitRequested().AddUObject(this, &ThisClass::HandleStateExitRequest);
+	CurrentState->SetData(StateMachineData);
+	
 	ensure(CurrentState->GetInputs().Contains(Input));
 	CurrentState->Enter(Input);
 }
@@ -36,10 +44,21 @@ void UStateMachine::Tick(const float& DeltaTime)
 	}
 }
 
+void UStateMachine::SetData(UStateMachineData* Data)
+{
+	StateMachineData = Data;
+}
+
+UStateMachineData* UStateMachine::CreateData()
+{
+	return NewObject<UStateMachineData>(this, DataType);
+}
+
 void UStateMachine::HandleStateExitRequest(const FName& Output)
 {
-	if(!ensure(CurrentState->GetOutputs().Contains(Output)))
+	if(!CurrentState->GetOutputs().Contains(Output))
 	{
+		LOG_GIOS_STATEMACHINES(Error, TEXT("Output '%s' not present in state '%s'"), *Output.ToString(), *GetNameSafe(CurrentState))
 		return;
 	}
 
