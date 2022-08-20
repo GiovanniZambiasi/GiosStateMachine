@@ -25,7 +25,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual void RunStateMachine(TSubclassOf<UStateMachine> Class);
-	
+
+	UFUNCTION(BlueprintCallable)
 	UStateMachine* GetStateMachine() const { return StateMachine; }
 
 protected:

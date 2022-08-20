@@ -1,7 +1,6 @@
 ﻿// Copyright MiddleMast. All rights reserved
 
 #include "StateMachine.h"
-
 #include "State.h"
 #include "GiosStateMachines.h"
 
@@ -64,7 +63,7 @@ void UStateMachine::HandleStateExitRequest(const FName& Output)
 
 	LOG_GIOS_STATEMACHINES(Display, TEXT("StateMachine received exit request through %s"), *Output.ToString());
 	
-	auto* PreviousState = CurrentState;
+	auto PreviousState = CurrentState;
 	
 	StateExitHandler.Execute(Output);
 

@@ -24,5 +24,7 @@ public class GiosStateMachines : ModuleRules
 				"SlateCore",
 			}
 			);
+		
+		CppStandard = CppStandardVersion.Cpp17;
 	}
 }

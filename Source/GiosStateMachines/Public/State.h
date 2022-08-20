@@ -27,6 +27,11 @@ class GIOSSTATEMACHINES_API UState : public UObject
 	FStateExitRequestHandler ExitRequestedEvent{};
 	
 public:
+	/**
+	 * @brief The input/output name used for the Return() function
+	 */
+	static FName GetReturnName() { return FName(TEXT("Return")); }
+	
 	FStateExitRequestHandler& OnExitRequested() { return ExitRequestedEvent; }
 
 	virtual void SetData(UStateMachineData* Data);
@@ -37,6 +42,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	virtual void RequestExit(FName Output);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void Return();
 	
 	const TArray<FName>& GetInputs() const { return Inputs; }
 	
@@ -55,4 +63,13 @@ protected:
 	void SetInputs(const TArray<FName>& InputNames);
 
 	void SetOutputs(const TArray<FName>& OutputNames);
+
+private:
+	void RemoveProtectedNames(TArray<FName>& Names, const TSet<FName>& ProtectedNames);
+
+#if WITH_EDITOR
+	
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
+#endif
 };

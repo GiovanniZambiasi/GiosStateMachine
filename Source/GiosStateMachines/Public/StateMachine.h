@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "StateMachineData.h"
 #include "UObject/Object.h"
+#include "StateActivation.h"
+#include "State.h"
 #include "StateMachine.generated.h"
 
 class UState;
@@ -22,24 +24,25 @@ class GIOSSTATEMACHINES_API UStateMachine : public UObject
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UStateMachineData> DataType = UStateMachineData::StaticClass();
-	
+
 	UPROPERTY()
 	UState* CurrentState;
 
 	UPROPERTY()
 	UStateMachineData* StateMachineData;
-	
+
 	FStateExitHandler StateExitHandler;
 	
 public:
 	UFUNCTION(BlueprintCallable)
 	void Run();
-	
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UState* GetCurrentState() const { return CurrentState; }
+
 	void Tick(const float& DeltaTime);
 
 	void SetData(UStateMachineData* Data);
-	
-	UState* GetCurrentState() const { return CurrentState; }
 
 	UStateMachineData* GetData() const { return StateMachineData; }
 	
