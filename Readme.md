@@ -9,7 +9,7 @@ A blueprint-friendly framework for implementing ``StateMachines`` within *Unreal
 - [X] Double-click targets
 - [X] ``StateMachineComponent``
 - [ ] When ``UClass`` updates, refresh nodes
-- [ ] ``StateMachineData``
+- [X] ``StateMachineData``
 - [ ] Nested ``StateMachines``
 - [ ] State history and ``Return``
 - [ ] Protected name validation (PN_Exec, PN_Then)

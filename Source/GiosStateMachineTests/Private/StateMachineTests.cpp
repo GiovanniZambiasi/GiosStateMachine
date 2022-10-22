@@ -41,8 +41,8 @@ BEGIN_DEFINE_SPEC(FStateMachineTests, TEXT("State Machine Tests"),
 
 	UStateMachine* LoadStateMachineResource(const FString& Path) const
 	{
-		const FSoftObjectPath ResourceRef(Path);
-		auto Resource = ResourceRef.TryLoad();
+		const TSoftObjectPtr<UBlueprint> ResourceRef(Path);
+		auto Resource = ResourceRef.LoadSynchronous();
 
 		return FGioTestUtils::CastResource<UStateMachine>(Resource);
 	}
