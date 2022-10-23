@@ -1,5 +1,4 @@
 ﻿#include "EngineUtils.h"
-#include "GiosStateMachines.h"
 #include "GiosStateMachineTests.h"
 #include "State.h"
 #include "StateMachine.h"
@@ -168,6 +167,72 @@ void FStateMachineTests::Define()
 		TestNotNull(TEXT("StateMachineData is not null"), NewState->GetData());
 	});
 
+	It(TEXT("GivenStateMachine_WhenInvalidContextRequestsExiit_ErrorIsLogged"), [this]
+		{
+			if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
+			{
+				return;
+			}
+		
+			AddExpectedError(TEXT("invalid context"), EAutomationExpectedErrorFlags::Contains);
+		
+			auto* StateMachine = StateMachineRunner->GetStateMachine();
+
+			auto* InitialState = StateMachine->GetCurrentState();
+			InitialState->RequestExit(TEXT("A"));
+			InitialState->RequestExit(TEXT("A"));
+		});
+	
+	It(TEXT("GivenStateMachine_WhenStateReturned_ReturnsToPreviousState"), [this]
+	{
+		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
+		{
+			return;
+		}
+
+		auto* StateMachine = StateMachineRunner->GetStateMachine();
+
+		auto* InitialState = StateMachine->GetCurrentState();
+		InitialState->RequestExit(TEXT("A"));
+
+		auto* NewState = StateMachine->GetCurrentState();
+		NewState->RequestReturn();
+
+		TestEqual(TEXT("Current state is InitialState"), StateMachine->GetCurrentState(), InitialState);
+	});
+
+	It(TEXT("GivenStateMachine_WhenInitialStateReturns_StateMachineStops"), [this]
+	{
+		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
+		{
+			return;
+		}
+
+		auto* StateMachine = StateMachineRunner->GetStateMachine();
+
+		auto* InitialState = StateMachine->GetCurrentState();
+		InitialState->RequestReturn();
+
+		TestFalse(TEXT("StateMachine is running"), StateMachine->IsRunning());
+	});
+
+	It(TEXT("GivenStateMachine_WhenInvalidContextRequestsReturn_ErrorIsLogged"), [this]
+	{
+		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
+		{
+			return;
+		}
+
+		AddExpectedError(TEXT("invalid context"), EAutomationExpectedErrorFlags::Contains);
+
+		auto* StateMachine = StateMachineRunner->GetStateMachine();
+
+		auto* InitialState = StateMachine->GetCurrentState();
+		InitialState->RequestExit(TEXT("A"));
+
+		InitialState->RequestReturn();
+	});
+	
 	AfterEach([this]
 	{
 		FGioTestUtils::Exit(Map);

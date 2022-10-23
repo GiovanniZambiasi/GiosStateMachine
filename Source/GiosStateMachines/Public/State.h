@@ -7,8 +7,11 @@
 #include "State.generated.h"
 
 class UStateMachineData;
+class UState;
 
-DECLARE_EVENT_OneParam(UState, FStateExitRequestHandler, const FName& /*RequestedOutput*/)
+DECLARE_EVENT_TwoParams(UState, FStateExitRequestHandler, UState* /*Context*/, const FName& /*RequestedOutput*/)
+
+DECLARE_EVENT_OneParam(UState, FStateReturnRequestHandler, UState* /*Context*/)
 
 UCLASS(Blueprintable)
 class GIOSSTATEMACHINES_API UState : public UObject
@@ -25,26 +28,40 @@ class GIOSSTATEMACHINES_API UState : public UObject
 	UStateMachineData* StateMachineData = nullptr;
 	
 	FStateExitRequestHandler ExitRequestedEvent{};
+
+	FStateReturnRequestHandler ReturnRequestedEvent{};
 	
 public:
-	/**
-	 * @brief The input/output name used for the Return() function
-	 */
-	static FName GetReturnName() { return FName(TEXT("Return")); }
-	
 	FStateExitRequestHandler& OnExitRequested() { return ExitRequestedEvent; }
+
+	FStateReturnRequestHandler& OnReturnRequested() { return ReturnRequestedEvent; }
 
 	virtual void SetData(UStateMachineData* Data);
 	
 	virtual void Enter(const FName& Input);
 	
 	virtual void Tick(const float& DeltaTime);
+	
+	/**
+	 * @brief Called when the state machine returns to this state from another state
+	 * <br><br>
+	 * <i>This a response to a call to RequestReturn() from another state in the owning StateMachine</i>
+	 */
+	virtual void Returned();
 
+	/**
+	 * @brief Requests an exit via the Output pin to it's owning StateMachine
+	 */
 	UFUNCTION(BlueprintCallable)
 	virtual void RequestExit(FName Output);
 
+	/**
+	 * @brief Requests a return to the previous state in the owning StateMachine's history
+	 * <br><br>
+	 * <i>If the history is empty, stops the state machine from running</i>
+	 */
 	UFUNCTION(BlueprintCallable)
-	virtual void Return();
+	virtual void RequestReturn();
 	
 	const TArray<FName>& GetInputs() const { return Inputs; }
 	
@@ -55,6 +72,9 @@ public:
 protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnEntered(const FName& Input);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnReturned();
 	
 	void AddInputs(const TArray<FName>& InputNames)	{ Inputs.Append(InputNames); }
 

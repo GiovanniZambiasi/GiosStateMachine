@@ -16,7 +16,7 @@ void UStateMachine::Run()
 	OnRun();
 }
 
-void UStateMachine::EnterState(UClass* StateClass, FName Input, const FStateExitHandler& ExitHandler)
+void UStateMachine::EnterNewState(UClass* StateClass, FName Input, const FStateExitHandler& ExitHandler)
 {
 	LOG_GIOS_STATEMACHINES(Display, TEXT("%s entering state %s"), *GetName(), *StateClass->GetName());
 	
@@ -25,21 +25,22 @@ void UStateMachine::EnterState(UClass* StateClass, FName Input, const FStateExit
 		return;
 	}
 
-	StateExitHandler = ExitHandler;
-	
-	CurrentState = NewObject<UState>(this, StateClass);
-	CurrentState->OnExitRequested().AddUObject(this, &ThisClass::HandleStateExitRequest);
-	CurrentState->SetData(StateMachineData);
-	
-	ensure(CurrentState->GetInputs().Contains(Input));
-	CurrentState->Enter(Input);
+	auto* State = NewObject<UState>(this, StateClass);
+	State->OnExitRequested().AddUObject(this, &ThisClass::HandleStateExitRequest);
+	State->OnReturnRequested().AddUObject(this, &ThisClass::HandleStateReturnRequest);
+	State->SetData(StateMachineData);
+	auto Activation = FStateActivation{State, MakeShared<FStateExitHandler>(ExitHandler)};
+	SetCurrentActivation(Activation);
+	StateHistory.Add(Activation);
+	ensure(State->GetInputs().Contains(Input));
+	State->Enter(Input);
 }
 
 void UStateMachine::Tick(const float& DeltaTime)
 {
-	if(CurrentState)
+	if(CurrentActivation.IsValid())
 	{
-		CurrentState->Tick(DeltaTime);
+		CurrentActivation.State->Tick(DeltaTime);
 	}
 }
 
@@ -53,23 +54,59 @@ UStateMachineData* UStateMachine::CreateData()
 	return NewObject<UStateMachineData>(this, DataType);
 }
 
-void UStateMachine::HandleStateExitRequest(const FName& Output)
+void UStateMachine::SetCurrentActivation(const FStateActivation& Activation)
 {
-	if(!CurrentState->GetOutputs().Contains(Output))
+	CurrentActivation = Activation;
+}
+
+void UStateMachine::HandleStateExitRequest(UState* Context, const FName& Output)
+{
+	if(Context != CurrentActivation.State)
 	{
-		LOG_GIOS_STATEMACHINES(Error, TEXT("Output '%s' not present in state '%s'"), *Output.ToString(), *GetNameSafe(CurrentState))
+		LOG_GIOS_STATEMACHINES(Error, TEXT("State exit request received from invalid context '%s'. Current state is '%s'"),
+			*GetNameSafe(Context), *GetNameSafe(CurrentActivation.State))
+		return;
+	}
+
+	if(!CurrentActivation.State->GetOutputs().Contains(Output))
+	{
+		LOG_GIOS_STATEMACHINES(Error, TEXT("Output '%s' not present in state '%s'"), *Output.ToString(), *GetNameSafe(CurrentActivation.State))
 		return;
 	}
 
 	LOG_GIOS_STATEMACHINES(Display, TEXT("StateMachine received exit request through %s"), *Output.ToString());
 	
-	auto PreviousState = CurrentState;
-	
-	StateExitHandler.Execute(Output);
+	auto PreviousState = CurrentActivation.State;
 
-	if(CurrentState == PreviousState)
+	CurrentActivation.ExitHandler->Execute(Output);
+
+	if(CurrentActivation.State == PreviousState)
 	{
 		LOG_GIOS_STATEMACHINES(Warning, TEXT("State '%s' requested exit '%s', but no transition was made.\n\nIs there a transition setup for the requested output?"),
-			*GetNameSafe(CurrentState), *Output.ToString())
+			*GetNameSafe(PreviousState), *Output.ToString())
 	}
+}
+
+void UStateMachine::HandleStateReturnRequest(UState* Context)
+{
+	if(Context != CurrentActivation.State)
+	{
+		LOG_GIOS_STATEMACHINES(Error, TEXT("State return request received invalid context '%s'. Current state is '%s'"),
+			*GetNameSafe(Context), *GetNameSafe(CurrentActivation.State))
+		return;
+	}
+
+	check(StateHistory.Num() > 0)
+	StateHistory.Pop();
+
+	if(StateHistory.Num() == 0)
+	{
+		CurrentActivation = FStateActivation{};
+		return;
+	}
+	
+	FStateActivation PreviousState = StateHistory.Last();
+	check(PreviousState.IsValid())
+	SetCurrentActivation(PreviousState);
+	PreviousState.State->Returned();
 }

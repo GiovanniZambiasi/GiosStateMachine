@@ -3,10 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "StateActivation.generated.h"
 
+class UState;
+
+USTRUCT()
 struct FStateActivation
 {
-	TSharedPtr<class UState> State;
+	GENERATED_BODY()
 
-	class FStateExitHandler& ExitHandler;
+	UPROPERTY()
+	UState* State;
+
+	TSharedPtr<class FStateExitHandler> ExitHandler;
+
+	bool IsValid() const { return State != nullptr; };
 };

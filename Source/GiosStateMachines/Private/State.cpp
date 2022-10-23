@@ -9,13 +9,11 @@ namespace
 	TSet<FName> ProtectedInputNames
 	{
 		TEXT("exec"),
-		UState::GetReturnName(),
 	};
 
 	TSet<FName> ProtectedOutputNames
 	{
 		TEXT("then"),
-		UState::GetReturnName(),
 	};
 }
 
@@ -45,16 +43,23 @@ void UState::SetOutputs(const TArray<FName>& OutputNames)
 void UState::RequestExit(FName Output)
 {
 	LOG_GIOS_STATEMACHINES(Display, TEXT("%s requesting exit from %s"), *GetName(), *Output.ToString())
-	ExitRequestedEvent.Broadcast(Output);
+	ExitRequestedEvent.Broadcast(this, Output);
 }
 
-void UState::Return()
+void UState::RequestReturn()
 {
-	RequestExit(TEXT("Return"));
+	LOG_GIOS_STATEMACHINES(Display, TEXT("%s requesting return"), *GetName())
+	ReturnRequestedEvent.Broadcast(this);
 }
 
 void UState::Tick(const float& DeltaTime)
 {
+}
+
+void UState::Returned()
+{
+	LOG_GIOS_STATEMACHINES(Display, TEXT("%s has been returned to"), *GetName())
+	OnReturned();
 }
 
 void UState::RemoveProtectedNames(TArray<FName>& Names, const TSet<FName>& ProtectedNames)

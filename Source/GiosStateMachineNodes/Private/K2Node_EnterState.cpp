@@ -190,7 +190,7 @@ void UK2Node_EnterState::ExpandInputPin(FKismetCompilerContext& CompilerContext,
 	static const FName StateClassParamName = TEXT("StateClass");
 	static const FName InputParamName = TEXT("Input");
 	static const FName StateExitRequestHandlerParamName = TEXT("ExitHandler");
-	static const FName EnterStateFunctionName = TEXT("EnterState");
+	static const FName EnterStateFunctionName = TEXT("EnterNewState");
 
 	auto* CallNode = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(this, SourceGraph);
 	const auto* Function = CompilerContext.NewClass->FindFunctionByName(EnterStateFunctionName);
