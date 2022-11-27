@@ -38,5 +38,5 @@ void UStateMachineRunnerComponent::RunStateMachine(TSubclassOf<UStateMachine> Cl
 {
 	StateMachine = NewObject<UStateMachine>(this, Class);
 	checkf(StateMachine, TEXT("%s's 'CreateStateMachine' function did not create a valid state machine. Make sure to set the StateMachineClass"), *GetNameSafe(GetOwner()))
-	StateMachine->Run();
+	StateMachine->EnterViaFirstInput();
 }

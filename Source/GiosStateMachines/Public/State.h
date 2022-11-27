@@ -19,12 +19,12 @@ class GIOSSTATEMACHINES_API UState : public UObject
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, Category="Gio's StateMachines")
-	TArray<FName> Inputs = { "Default" };
+	TArray<FName> Inputs = { TEXT("Default") };
 
 	UPROPERTY(EditDefaultsOnly, Category="Gio's StateMachines")
-	TArray<FName> Outputs = { "Default" };
+	TArray<FName> Outputs = { TEXT("Default") };
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	UStateMachineData* StateMachineData = nullptr;
 	
 	FStateExitRequestHandler ExitRequestedEvent{};
@@ -63,9 +63,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void RequestReturn();
 	
-	const TArray<FName>& GetInputs() const { return Inputs; }
+	virtual const TArray<FName>& GetInputs() const { return Inputs; }
 	
-	const TArray<FName>& GetOutputs() const { return Outputs; }
+	virtual const TArray<FName>& GetOutputs() const { return Outputs; }
 
 	UStateMachineData* GetData() const { return StateMachineData; }
 	

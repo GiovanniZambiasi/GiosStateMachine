@@ -4,16 +4,23 @@
 #include "State.h"
 #include "GiosStateMachines.h"
 
-void UStateMachine::Run()
+void UStateMachine::Enter(const FName& Input)
 {
-	if(StateMachineData == nullptr)
+	if(GetData() == nullptr)
 	{
 		SetData(CreateData());
 	}
 	
-	LOG_GIOS_STATEMACHINES(Display, TEXT("State machine running"))
-	
-	OnRun();
+	Super::Enter(Input);
+}
+
+void UStateMachine::EnterViaFirstInput()
+{
+	const TArray<FName>& AllInputs = GetInputs();
+	if(ensureAlwaysMsgf(AllInputs.Num() > 0, TEXT("'%s' has no valid inputs"), *GetName()))
+	{
+		Enter(AllInputs[0]);
+	}
 }
 
 void UStateMachine::EnterNewState(UClass* StateClass, FName Input, const FStateExitHandler& ExitHandler)
@@ -28,7 +35,7 @@ void UStateMachine::EnterNewState(UClass* StateClass, FName Input, const FStateE
 	auto* State = NewObject<UState>(this, StateClass);
 	State->OnExitRequested().AddUObject(this, &ThisClass::HandleStateExitRequest);
 	State->OnReturnRequested().AddUObject(this, &ThisClass::HandleStateReturnRequest);
-	State->SetData(StateMachineData);
+	State->SetData(GetData());
 	auto Activation = FStateActivation{State, MakeShared<FStateExitHandler>(ExitHandler)};
 	SetCurrentActivation(Activation);
 	StateHistory.Add(Activation);
@@ -42,11 +49,6 @@ void UStateMachine::Tick(const float& DeltaTime)
 	{
 		CurrentActivation.State->Tick(DeltaTime);
 	}
-}
-
-void UStateMachine::SetData(UStateMachineData* Data)
-{
-	StateMachineData = Data;
 }
 
 UStateMachineData* UStateMachine::CreateData()
