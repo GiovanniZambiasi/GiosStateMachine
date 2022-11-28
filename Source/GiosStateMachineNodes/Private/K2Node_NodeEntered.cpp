@@ -1,15 +1,15 @@
 ﻿// Copyright MiddleMast. All rights reserved
 
-#include "K2Node_StateEntered.h"
+#include "K2Node_NodeEntered.h"
 #include "K2Node_Event.h"
 #include "K2Node_SwitchName.h"
 #include "KismetCompiler.h"
 
-#include "State.h"
+#include "GioNode.h"
 
 #define LOCTEXT_NAMESPACE "UK2Node_StateEntered"
 
-void UK2Node_StateEntered::AllocateDefaultPins()
+void UK2Node_NodeEntered::AllocateDefaultPins()
 {
 	Super::AllocateDefaultPins();
 	
@@ -19,7 +19,7 @@ void UK2Node_StateEntered::AllocateDefaultPins()
 	}
 }
 
-void UK2Node_StateEntered::AllocateInputPins(const UState* State)
+void UK2Node_NodeEntered::AllocateInputPins(const UGioNode* State)
 {
 	auto Inputs = State->GetInputs();
 
@@ -29,7 +29,7 @@ void UK2Node_StateEntered::AllocateInputPins(const UState* State)
 	}
 }
 
-TArray<UEdGraphPin*> UK2Node_StateEntered::GetInputPins()
+TArray<UEdGraphPin*> UK2Node_NodeEntered::GetInputPins()
 {
 	TArray<UEdGraphPin*> InputPins{};
 
@@ -44,12 +44,12 @@ TArray<UEdGraphPin*> UK2Node_StateEntered::GetInputPins()
 	return InputPins;
 }
 
-bool UK2Node_StateEntered::IsStateInputPin(const UEdGraphPin* Pin) const
+bool UK2Node_NodeEntered::IsStateInputPin(const UEdGraphPin* Pin) const
 {
 	return Pin->Direction == EGPD_Output || Pin->GetFName() != UEdGraphSchema_K2::PN_Then || Pin->PinType.PinCategory == UEdGraphSchema_K2::PC_Exec;
 }
 
-void UK2Node_StateEntered::ExpandNode(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
+void UK2Node_NodeEntered::ExpandNode(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
 {
 	Super::ExpandNode(CompilerContext, SourceGraph);
 
@@ -58,7 +58,7 @@ void UK2Node_StateEntered::ExpandNode(FKismetCompilerContext& CompilerContext, U
 	const auto* Schema = Cast<UEdGraphSchema_K2>(GetSchema());
 	
 	auto* StateEnteredNode = CompilerContext.SpawnIntermediateNode<UK2Node_Event>(this, SourceGraph);
-	StateEnteredNode->EventReference.SetExternalMember(TEXT("OnEntered"), UState::StaticClass());
+	StateEnteredNode->EventReference.SetExternalMember(TEXT("OnEntered"), UGioNode::StaticClass());
 	StateEnteredNode->bOverrideFunction = true;
 	StateEnteredNode->AllocateDefaultPins();
 
@@ -110,7 +110,7 @@ void UK2Node_StateEntered::ExpandNode(FKismetCompilerContext& CompilerContext, U
 	BreakAllNodeLinks();
 }
 
-void UK2Node_StateEntered::ValidateNodeDuringCompilation(FCompilerResultsLog& MessageLog) const
+void UK2Node_NodeEntered::ValidateNodeDuringCompilation(FCompilerResultsLog& MessageLog) const
 {
 	Super::ValidateNodeDuringCompilation(MessageLog);
 	

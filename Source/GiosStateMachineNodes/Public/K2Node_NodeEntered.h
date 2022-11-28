@@ -2,18 +2,18 @@
 
 #pragma once
 
-#include "K2Node_StateNode.h"
-#include "K2Node_StateEntered.generated.h"
+#include "K2Node_GioStateNode.h"
+#include "K2Node_NodeEntered.generated.h"
 
-class UState;
+class UGioNode;
 
 UCLASS()
-class GIOSSTATEMACHINENODES_API UK2Node_StateEntered : public UK2Node_StateNode
+class GIOSSTATEMACHINENODES_API UK2Node_NodeEntered : public UK2Node_GioStateNode
 {
 	GENERATED_BODY()
 	
 public:
-	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override { return FText::FromString(TEXT("State Entered")); }
+	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override { return FText::FromString(TEXT("Node Entered")); }
 
 	virtual bool DrawNodeAsExit() const override { return true; }
 	
@@ -26,7 +26,7 @@ public:
 	virtual void ValidateNodeDuringCompilation(FCompilerResultsLog& MessageLog) const override;
 
 private:
-	void AllocateInputPins(const UState* State);
+	void AllocateInputPins(const UGioNode* State);
 
 	TArray<UEdGraphPin*> GetInputPins();
 

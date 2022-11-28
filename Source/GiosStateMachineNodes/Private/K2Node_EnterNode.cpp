@@ -1,9 +1,9 @@
 // Copyright MiddleMast. All rights reserved
 
-#include "K2Node_EnterState.h"
+#include "K2Node_EnterNode.h"
 
 #include "BlueprintActionDatabaseRegistrar.h"
-#include "State.h"
+#include "GioNode.h"
 #include "EdGraphSchema_K2.h"
 #include "GiosStateMachines.h"
 #include "K2Node_CallFunction.h"
@@ -11,7 +11,7 @@
 #include "K2Node_CustomEvent.h"
 #include "K2Node_SwitchName.h"
 #include "KismetCompiler.h"
-#include "StateMachine.h"
+#include "GioStateMachine.h"
 
 #define LOCTEXT_NAMESPACE "K2Node_EnterState"
 
@@ -21,15 +21,15 @@ namespace
 	const FName ExitNodeOutputPinName = TEXT("Output");
 }
 
-void UK2Node_EnterState::AllocateDefaultPins()
+void UK2Node_EnterNode::AllocateDefaultPins()
 {
 	Super::AllocateDefaultPins();
 
-	auto ClassPin = CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Class, UState::StaticClass(), ClassPinName);
+	auto ClassPin = CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Class, UGioNode::StaticClass(), ClassPinName);
 	ClassPin->bNotConnectable = true;
 }
 
-void UK2Node_EnterState::ReallocatePinsDuringReconstruction(TArray<UEdGraphPin*>& OldPins)
+void UK2Node_EnterNode::ReallocatePinsDuringReconstruction(TArray<UEdGraphPin*>& OldPins)
 {
 	Super::ReallocatePinsDuringReconstruction(OldPins);
 
@@ -49,7 +49,7 @@ void UK2Node_EnterState::ReallocatePinsDuringReconstruction(TArray<UEdGraphPin*>
 	RefreshInputAndOutputPins();
 }
 
-void UK2Node_EnterState::PinDefaultValueChanged(UEdGraphPin* Pin)
+void UK2Node_EnterNode::PinDefaultValueChanged(UEdGraphPin* Pin)
 {
 	Super::PinDefaultValueChanged(Pin);
 
@@ -60,7 +60,7 @@ void UK2Node_EnterState::PinDefaultValueChanged(UEdGraphPin* Pin)
 	}
 }
 
-UObject* UK2Node_EnterState::GetJumpTargetForDoubleClick() const
+UObject* UK2Node_EnterNode::GetJumpTargetForDoubleClick() const
 {
 	auto ClassPin = GetClassPin();
 	auto Class = Cast<UClass>(ClassPin->DefaultObject);
@@ -78,7 +78,7 @@ UObject* UK2Node_EnterState::GetJumpTargetForDoubleClick() const
 	return Super::GetJumpTargetForDoubleClick();
 }
 
-void UK2Node_EnterState::RefreshInputAndOutputPins()
+void UK2Node_EnterNode::RefreshInputAndOutputPins()
 {
 	const auto* Class = Cast<UClass>(GetClassPin()->DefaultObject);
 
@@ -87,7 +87,7 @@ void UK2Node_EnterState::RefreshInputAndOutputPins()
 
 	if (Class != nullptr && Class->ClassDefaultObject != nullptr)
 	{
-		const auto* DefaultObject = Cast<UState>(Class->ClassDefaultObject);
+		const auto* DefaultObject = Cast<UGioNode>(Class->ClassDefaultObject);
 
 		auto Outputs = DefaultObject->GetOutputs();
 
@@ -105,7 +105,7 @@ void UK2Node_EnterState::RefreshInputAndOutputPins()
 	}
 }
 
-void UK2Node_EnterState::FindInputAndOutputPins()
+void UK2Node_EnterNode::FindInputAndOutputPins()
 {
 	InputPins.Empty();
 	OutputPins.Empty();
@@ -130,7 +130,7 @@ void UK2Node_EnterState::FindInputAndOutputPins()
 	}
 }
 
-void UK2Node_EnterState::ExpandNode(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
+void UK2Node_EnterNode::ExpandNode(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
 {
 	Super::ExpandNode(CompilerContext, SourceGraph);
 
@@ -157,7 +157,7 @@ void UK2Node_EnterState::ExpandNode(FKismetCompilerContext& CompilerContext, UEd
 	BreakAllNodeLinks();
 }
 
-UK2Node_CustomEvent* UK2Node_EnterState::CreateExitEventNode(FKismetCompilerContext& CompilerContext,
+UK2Node_CustomEvent* UK2Node_EnterNode::CreateExitEventNode(FKismetCompilerContext& CompilerContext,
                                                              UEdGraph* SourceGraph, const FName& StateClassName)
 {
 	auto* ExitEventNode = CompilerContext.SpawnIntermediateNode<UK2Node_CustomEvent>(this, SourceGraph);
@@ -174,7 +174,7 @@ UK2Node_CustomEvent* UK2Node_EnterState::CreateExitEventNode(FKismetCompilerCont
 	return ExitEventNode;
 }
 
-void UK2Node_EnterState::ExpandInputPins(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph,
+void UK2Node_EnterNode::ExpandInputPins(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph,
                                          const UEdGraphSchema_K2* Schema, UEdGraphPin* OutputDelegatePin)
 {
 	for (auto* Pin : InputPins)
@@ -183,17 +183,17 @@ void UK2Node_EnterState::ExpandInputPins(FKismetCompilerContext& CompilerContext
 	}
 }
 
-void UK2Node_EnterState::ExpandInputPin(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph,
+void UK2Node_EnterNode::ExpandInputPin(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph,
                                         UEdGraphPin* InputPin, const UEdGraphSchema_K2* Schema,
                                         UEdGraphPin* OutputDelegatePin)
 {
-	static const FName StateClassParamName = TEXT("StateClass");
+	static const FName StateClassParamName = TEXT("NodeClass");
 	static const FName InputParamName = TEXT("Input");
-	static const FName StateExitRequestHandlerParamName = TEXT("ExitHandler");
-	static const FName EnterStateFunctionName = TEXT("EnterNewState");
+	static const FName NodeExitRequestHandlerParamName = TEXT("ExitHandler");
+	static const FName EnterNodeFunctionName = TEXT("EnterNewNode");
 
 	auto* CallNode = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(this, SourceGraph);
-	const auto* Function = CompilerContext.NewClass->FindFunctionByName(EnterStateFunctionName);
+	const auto* Function = CompilerContext.NewClass->FindFunctionByName(EnterNodeFunctionName);
 
 	CompilerContext.MessageLog.NotifyIntermediateObjectCreation(CallNode, this);
 
@@ -201,7 +201,7 @@ void UK2Node_EnterState::ExpandInputPin(FKismetCompilerContext& CompilerContext,
 	{
 		CompilerContext.MessageLog.Error(
 			TEXT("No function named '%s' found in class %s. This node can only be added to %s objects"),
-			*EnterStateFunctionName.ToString(), *CompilerContext.NewClass->GetName(), *UStateMachine::StaticClass()->GetName());
+			*EnterNodeFunctionName.ToString(), *CompilerContext.NewClass->GetName(), *UGioStateMachine::StaticClass()->GetName());
 
 		return;
 	}
@@ -215,14 +215,14 @@ void UK2Node_EnterState::ExpandInputPin(FKismetCompilerContext& CompilerContext,
 	auto* InputParamPin = CallNode->FindPinChecked(InputParamName);
 	InputParamPin->DefaultValue = InputPin->GetName();
 
-	auto* StateExitHandlerPin = CallNode->FindPinChecked(StateExitRequestHandlerParamName);
+	auto* StateExitHandlerPin = CallNode->FindPinChecked(NodeExitRequestHandlerParamName);
 	verify(Schema->TryCreateConnection(StateExitHandlerPin, OutputDelegatePin));
 
 	auto* ExecutePin = CallNode->GetExecPin();
 	CompilerContext.MovePinLinksToIntermediate(*InputPin, *ExecutePin);
 }
 
-void UK2Node_EnterState::ExpandOutputPins(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph,
+void UK2Node_EnterNode::ExpandOutputPins(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph,
                                           const UEdGraphSchema_K2* Schema, UK2Node_CustomEvent* ExitEventNode)
 {
 	TArray<FName> OutputPinNames{};
@@ -255,7 +255,7 @@ void UK2Node_EnterState::ExpandOutputPins(FKismetCompilerContext& CompilerContex
 	verify(Schema->TryCreateConnection(ExitThenPin, SwitchExecutePin))
 }
 
-UEdGraphPin* UK2Node_EnterState::GetClassPin() const
+UEdGraphPin* UK2Node_EnterNode::GetClassPin() const
 {
 	return FindPinChecked(ClassPinName);
 }

@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "StateMachineRunnerComponent.generated.h"
 
-class UStateMachine;
+class UGioStateMachine;
 
 UCLASS( ClassGroup=("Gio's State Machines"), meta=(BlueprintSpawnableComponent) )
 class GIOSSTATEMACHINES_API UStateMachineRunnerComponent : public UActorComponent
@@ -14,20 +14,20 @@ class GIOSSTATEMACHINES_API UStateMachineRunnerComponent : public UActorComponen
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<UStateMachine> StateMachineClass;
+	TSubclassOf<UGioStateMachine> StateMachineClass;
 
 	UPROPERTY()
-	UStateMachine* StateMachine;
+	UGioStateMachine* StateMachine;
 	
 public:	
 	UStateMachineRunnerComponent();
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void RunStateMachine(TSubclassOf<UStateMachine> Class);
+	virtual void RunStateMachine(TSubclassOf<UGioStateMachine> Class);
 
 	UFUNCTION(BlueprintCallable)
-	UStateMachine* GetStateMachine() const { return StateMachine; }
+	UGioStateMachine* GetStateMachine() const { return StateMachine; }
 
 protected:
 	virtual void BeginPlay() override;

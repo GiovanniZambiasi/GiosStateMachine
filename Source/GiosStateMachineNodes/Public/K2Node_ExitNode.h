@@ -3,16 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "K2Node_StateNode.h"
-#include "State.h"
-#include "K2Node_StateExit.generated.h"
+#include "K2Node_GioStateNode.h"
+#include "GioNode.h"
+#include "K2Node_ExitNode.generated.h"
 
 UCLASS()
-class GIOSSTATEMACHINENODES_API UK2Node_StateExit : public UK2Node_StateNode
+class GIOSSTATEMACHINENODES_API UK2Node_ExitNode : public UK2Node_GioStateNode
 {
 	GENERATED_BODY()
 public:
-	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override { return FText::FromString(TEXT("Exit State")); }
+	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override { return FText::FromString(TEXT("Exit Node")); }
 
 	virtual bool IsNodeSafeToIgnore() const override { return true; }
 	
@@ -25,7 +25,7 @@ public:
 	virtual void ValidateNodeDuringCompilation(FCompilerResultsLog& MessageLog) const override;
 	
 private:
-	void AllocateOutputPins(const UState* State);
+	void AllocateOutputPins(const UGioNode* State);
 
 	void ExpandOutputPin(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph, UEdGraphPin* Pin);
 

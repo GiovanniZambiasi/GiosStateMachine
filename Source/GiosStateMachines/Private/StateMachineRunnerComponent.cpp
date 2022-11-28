@@ -3,13 +3,13 @@
 #include "StateMachineRunnerComponent.h"
 
 #include "GiosStateMachines.h"
-#include "State.h"
-#include "StateMachine.h"
+#include "GioNode.h"
+#include "GioStateMachine.h"
 
 UStateMachineRunnerComponent::UStateMachineRunnerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	StateMachineClass = UStateMachine::StaticClass();
+	StateMachineClass = UGioStateMachine::StaticClass();
 }
 
 void UStateMachineRunnerComponent::BeginPlay()
@@ -34,9 +34,9 @@ void UStateMachineRunnerComponent::TickComponent(float DeltaTime, ELevelTick Tic
 	}
 }
 
-void UStateMachineRunnerComponent::RunStateMachine(TSubclassOf<UStateMachine> Class)
+void UStateMachineRunnerComponent::RunStateMachine(TSubclassOf<UGioStateMachine> Class)
 {
-	StateMachine = NewObject<UStateMachine>(this, Class);
+	StateMachine = NewObject<UGioStateMachine>(this, Class);
 	checkf(StateMachine, TEXT("%s's 'CreateStateMachine' function did not create a valid state machine. Make sure to set the StateMachineClass"), *GetNameSafe(GetOwner()))
 	StateMachine->EnterViaFirstInput();
 }

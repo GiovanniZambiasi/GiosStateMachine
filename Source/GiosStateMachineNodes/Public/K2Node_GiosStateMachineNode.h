@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "K2Node.h"
-#include "GiosStateMachineNodes.h"
 #include "GiosStateMachines.h"
 #include "K2Node_GiosStateMachineNode.generated.h"
 

@@ -1,7 +1,6 @@
 ﻿// Copyright MiddleMast. All rights reserved
 
-#include "State.h"
-
+#include "GioNode.h"
 #include "GiosStateMachines.h"
 
 namespace
@@ -17,52 +16,52 @@ namespace
 	};
 }
 
-void UState::SetData(UStateMachineData* Data)
+void UGioNode::SetData(UGioStateMachineData* Data)
 {
 	StateMachineData = Data;
 }
 
-void UState::Enter(const FName& Input)
+void UGioNode::Enter(const FName& Input)
 {
 	LOG_GIOS_STATEMACHINES(Display, TEXT("%s entered via '%s'"), *GetName(), *Input.ToString());
 	OnEntered(Input);
 }
 
-void UState::SetInputs(const TArray<FName>& InputNames)
+void UGioNode::SetInputs(const TArray<FName>& InputNames)
 {
 	Inputs.Empty();
 	Inputs.Append(InputNames);
 }
 
-void UState::SetOutputs(const TArray<FName>& OutputNames)
+void UGioNode::SetOutputs(const TArray<FName>& OutputNames)
 {
 	Outputs.Empty();
 	Outputs.Append(OutputNames);
 }
 
-void UState::RequestExit(FName Output)
+void UGioNode::RequestExit(FName Output)
 {
 	LOG_GIOS_STATEMACHINES(Display, TEXT("%s requesting exit from %s"), *GetName(), *Output.ToString())
 	ExitRequestedEvent.Broadcast(this, Output);
 }
 
-void UState::RequestReturn()
+void UGioNode::RequestReturn()
 {
 	LOG_GIOS_STATEMACHINES(Display, TEXT("%s requesting return"), *GetName())
 	ReturnRequestedEvent.Broadcast(this);
 }
 
-void UState::Tick(const float& DeltaTime)
+void UGioNode::Tick(const float& DeltaTime)
 {
 }
 
-void UState::Returned()
+void UGioNode::Returned()
 {
 	LOG_GIOS_STATEMACHINES(Display, TEXT("%s has been returned to"), *GetName())
 	OnReturned();
 }
 
-void UState::RemoveProtectedNames(TArray<FName>& Names, const TSet<FName>& ProtectedNames)
+void UGioNode::RemoveProtectedNames(TArray<FName>& Names, const TSet<FName>& ProtectedNames)
 {
 	TArray<FName> RemovedNames{};
 	
@@ -85,7 +84,7 @@ void UState::RemoveProtectedNames(TArray<FName>& Names, const TSet<FName>& Prote
 
 #if WITH_EDITOR
 
-void UState::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+void UGioNode::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	UObject::PostEditChangeProperty(PropertyChangedEvent);
 

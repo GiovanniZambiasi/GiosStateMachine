@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "StateActivation.generated.h"
 
-class UState;
+class UGioNode;
 
 USTRUCT()
 struct FStateActivation
@@ -13,9 +13,9 @@ struct FStateActivation
 	GENERATED_BODY()
 
 	UPROPERTY()
-	UState* State;
+	UGioNode* Node;
 
-	TSharedPtr<class FStateExitHandler> ExitHandler;
+	TSharedPtr<class FNodeExitHandler> ExitHandler;
 
-	bool IsValid() const { return State != nullptr; };
+	bool IsValid() const { return Node != nullptr; };
 };

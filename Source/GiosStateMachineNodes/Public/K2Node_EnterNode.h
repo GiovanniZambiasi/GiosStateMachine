@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "K2Node_CustomEvent.h"
 #include "K2Node_GiosStateMachineNode.h"
-#include "K2Node_EnterState.generated.h"
+#include "K2Node_EnterNode.generated.h"
 
 class UEdGraphSchema_K2;
 class UK2Node_CustomEvent;
 
 UCLASS()
-class GIOSSTATEMACHINENODES_API UK2Node_EnterState : public UK2Node_GiosStateMachineNode
+class GIOSSTATEMACHINENODES_API UK2Node_EnterNode : public UK2Node_GiosStateMachineNode
 {
 	GENERATED_BODY()
 
@@ -22,7 +22,7 @@ class GIOSSTATEMACHINENODES_API UK2Node_EnterState : public UK2Node_GiosStateMac
 public:
 	virtual void AllocateDefaultPins() override;
 
-	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override { return FText::FromString(TEXT("Enter State")); }
+	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override { return FText::FromString(TEXT("Enter Node")); }
 
 	virtual void ReallocatePinsDuringReconstruction(TArray<UEdGraphPin*>& OldPins) override;
 	

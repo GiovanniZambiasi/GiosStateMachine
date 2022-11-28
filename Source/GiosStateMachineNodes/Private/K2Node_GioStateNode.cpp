@@ -1,11 +1,11 @@
 ﻿// Copyright MiddleMast. All rights reserved
 
-#include "K2Node_StateNode.h"
-#include "State.h"
+#include "K2Node_GioStateNode.h"
+#include "GioNode.h"
 
 #define LOCTEXT_NAMESPACE "UK2Node_StateNode"
 
-UState* UK2Node_StateNode::GetDefaultStateObject() const
+UGioNode* UK2Node_GioStateNode::GetDefaultStateObject() const
 {
 	auto Class = GetBlueprint()->GeneratedClass;
 	
@@ -14,7 +14,7 @@ UState* UK2Node_StateNode::GetDefaultStateObject() const
 		return nullptr;
 	}
 	
-	return Cast<UState>(Class->ClassDefaultObject);
+	return Cast<UGioNode>(Class->ClassDefaultObject);
 }
 
 #undef LOCTEXT_NAMESPACE

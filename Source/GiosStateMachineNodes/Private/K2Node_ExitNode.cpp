@@ -1,14 +1,14 @@
 // Copyright MiddleMast. All rights reserved
 
 
-#include "K2Node_StateExit.h"
+#include "K2Node_ExitNode.h"
 
 #include "K2Node_CallFunction.h"
 #include "KismetCompiler.h"
 
 #define LOCTEXT_NAMESPACE "UK2Node_StateExit"
 
-void UK2Node_StateExit::AllocateDefaultPins()
+void UK2Node_ExitNode::AllocateDefaultPins()
 {
 	Super::AllocateDefaultPins();
 
@@ -18,7 +18,7 @@ void UK2Node_StateExit::AllocateDefaultPins()
 	}
 }
 
-void UK2Node_StateExit::AllocateOutputPins(const UState* State)
+void UK2Node_ExitNode::AllocateOutputPins(const UGioNode* State)
 {
 	auto Outputs = State->GetOutputs();
 
@@ -28,7 +28,7 @@ void UK2Node_StateExit::AllocateOutputPins(const UState* State)
 	}
 }
 
-TArray<UEdGraphPin*> UK2Node_StateExit::GetOutputPins()
+TArray<UEdGraphPin*> UK2Node_ExitNode::GetOutputPins()
 {
 	TArray<UEdGraphPin*> Outputs{};
 
@@ -43,12 +43,12 @@ TArray<UEdGraphPin*> UK2Node_StateExit::GetOutputPins()
 	return Outputs;
 }
 
-bool UK2Node_StateExit::IsStateOutputPin(const UEdGraphPin* Pin) const
+bool UK2Node_ExitNode::IsStateOutputPin(const UEdGraphPin* Pin) const
 {
 	return Pin->Direction == EGPD_Input || Pin->GetFName() != UEdGraphSchema_K2::PN_Execute || Pin->PinType.PinCategory == UEdGraphSchema_K2::PC_Exec;
 }
 
-void UK2Node_StateExit::ExpandNode(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
+void UK2Node_ExitNode::ExpandNode(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph)
 {
 	Super::ExpandNode(CompilerContext, SourceGraph);
 
@@ -62,7 +62,7 @@ void UK2Node_StateExit::ExpandNode(FKismetCompilerContext& CompilerContext, UEdG
 	BreakAllNodeLinks();
 }
 
-void UK2Node_StateExit::ValidateNodeDuringCompilation(FCompilerResultsLog& MessageLog) const
+void UK2Node_ExitNode::ValidateNodeDuringCompilation(FCompilerResultsLog& MessageLog) const
 {
 	Super::ValidateNodeDuringCompilation(MessageLog);
 
@@ -92,10 +92,10 @@ void UK2Node_StateExit::ValidateNodeDuringCompilation(FCompilerResultsLog& Messa
 	}
 }
 
-void UK2Node_StateExit::ExpandOutputPin(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph, UEdGraphPin* Pin)
+void UK2Node_ExitNode::ExpandOutputPin(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph, UEdGraphPin* Pin)
 {
 	UK2Node_CallFunction* CallNode = CompilerContext.SpawnIntermediateNode<UK2Node_CallFunction>(this, SourceGraph);
-	const auto FunctionName = GET_FUNCTION_NAME_CHECKED(UState, RequestExit);
+	const auto FunctionName = GET_FUNCTION_NAME_CHECKED(UGioNode, RequestExit);
 	const auto* Function = CompilerContext.NewClass->FindFunctionByName(FunctionName);
 
 	CompilerContext.MessageLog.NotifyIntermediateObjectCreation(CallNode, this);
@@ -103,7 +103,7 @@ void UK2Node_StateExit::ExpandOutputPin(FKismetCompilerContext& CompilerContext,
 	if(Function == nullptr)
 	{
 		CompilerContext.MessageLog.Error(TEXT("No function named '%s' found in class %s. This node can only be added to %s objects"),
-			*FunctionName.ToString(), *CompilerContext.NewClass->GetName(), *UState::StaticClass()->GetName());
+			*FunctionName.ToString(), *CompilerContext.NewClass->GetName(), *UGioNode::StaticClass()->GetName());
 
 		return;
 	}

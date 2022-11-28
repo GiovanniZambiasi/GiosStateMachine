@@ -1,13 +1,13 @@
 ﻿#include "EngineUtils.h"
 #include "GiosStateMachineTests.h"
-#include "State.h"
-#include "StateMachine.h"
+#include "GioNode.h"
+#include "GioStateMachine.h"
 #include "StateMachineRunnerComponent.h"
 #include "Engine/AssetManager.h"
 #include "Misc/AutomationTest.h"
 #include "Tests/AutomationCommon.h"
 
-BEGIN_DEFINE_SPEC(FStateMachineTests, TEXT("State Machine Tests"),
+BEGIN_DEFINE_SPEC(FStateMachineTests, TEXT("GioStateMachine"),
                   EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
 
 	UWorld* Map;
@@ -38,12 +38,12 @@ BEGIN_DEFINE_SPEC(FStateMachineTests, TEXT("State Machine Tests"),
 		TestNotNull(TEXT("Map is not null"), Map);
 	}
 
-	UStateMachine* LoadStateMachineResource(const FString& Path) const
+	UGioStateMachine* LoadStateMachineResource(const FString& Path) const
 	{
 		const TSoftObjectPtr<UBlueprint> ResourceRef(Path);
 		auto Resource = ResourceRef.LoadSynchronous();
 
-		return FGioTestUtils::CastResource<UStateMachine>(Resource);
+		return FGioTestUtils::CastResource<UGioStateMachine>(Resource);
 	}
 
 	bool LoadAndRunStateMachine(const FString& ResourcePath)
@@ -84,10 +84,10 @@ void FStateMachineTests::Define()
 
 		auto* StateMachine = StateMachineRunner->GetStateMachine();
 
-		auto* InitialState = StateMachine->GetCurrentState();
+		auto* InitialState = StateMachine->GetCurrentNode();
 		InitialState->RequestExit(TEXT("A"));
 
-		auto* CurrentState = StateMachine->GetCurrentState();
+		auto* CurrentState = StateMachine->GetCurrentNode();
 
 		TestEqual(TEXT("State is A"), CurrentState->GetClass()->GetName(), FString{TEXT("BP_StateA_C")});
 	});
@@ -101,10 +101,10 @@ void FStateMachineTests::Define()
 
 		auto* StateMachine = StateMachineRunner->GetStateMachine();
 
-		auto* InitialState = StateMachine->GetCurrentState();
+		auto* InitialState = StateMachine->GetCurrentNode();
 		InitialState->RequestExit(TEXT("B"));
 
-		auto* CurrentState = StateMachine->GetCurrentState();
+		auto* CurrentState = StateMachine->GetCurrentNode();
 
 		TestEqual(TEXT("State is B"), CurrentState->GetClass()->GetName(), FString{TEXT("BP_StateB_C")});
 	});
@@ -120,7 +120,7 @@ void FStateMachineTests::Define()
 
 		AddExpectedError(TEXT("Output 'C' not present"), EAutomationExpectedErrorFlags::Contains);
 
-		auto* InitialState = StateMachine->GetCurrentState();
+		auto* InitialState = StateMachine->GetCurrentNode();
 		InitialState->RequestExit(TEXT("C"));
 	});
 
@@ -145,7 +145,7 @@ void FStateMachineTests::Define()
 
 		auto* StateMachine = StateMachineRunner->GetStateMachine();
 
-		auto* InitialState = StateMachine->GetCurrentState();
+		auto* InitialState = StateMachine->GetCurrentNode();
 
 		TestNotNull(TEXT("StateMachineData is not null"), InitialState->GetData());
 	});
@@ -159,10 +159,10 @@ void FStateMachineTests::Define()
 
 		auto* StateMachine = StateMachineRunner->GetStateMachine();
 
-		auto* InitialState = StateMachine->GetCurrentState();
+		auto* InitialState = StateMachine->GetCurrentNode();
 		InitialState->RequestExit(TEXT("A"));
 
-		auto* NewState = StateMachine->GetCurrentState();
+		auto* NewState = StateMachine->GetCurrentNode();
 
 		TestNotNull(TEXT("StateMachineData is not null"), NewState->GetData());
 	});
@@ -178,7 +178,7 @@ void FStateMachineTests::Define()
 		
 			auto* StateMachine = StateMachineRunner->GetStateMachine();
 
-			auto* InitialState = StateMachine->GetCurrentState();
+			auto* InitialState = StateMachine->GetCurrentNode();
 			InitialState->RequestExit(TEXT("A"));
 			InitialState->RequestExit(TEXT("A"));
 		});
@@ -192,13 +192,13 @@ void FStateMachineTests::Define()
 
 		auto* StateMachine = StateMachineRunner->GetStateMachine();
 
-		auto* InitialState = StateMachine->GetCurrentState();
+		auto* InitialState = StateMachine->GetCurrentNode();
 		InitialState->RequestExit(TEXT("A"));
 
-		auto* NewState = StateMachine->GetCurrentState();
+		auto* NewState = StateMachine->GetCurrentNode();
 		NewState->RequestReturn();
 
-		TestEqual(TEXT("Current state is InitialState"), StateMachine->GetCurrentState(), InitialState);
+		TestEqual(TEXT("Current state is InitialState"), StateMachine->GetCurrentNode(), InitialState);
 	});
 
 	It(TEXT("GivenStateMachine_WhenInitialStateReturns_StateMachineStops"), [this]
@@ -210,7 +210,7 @@ void FStateMachineTests::Define()
 
 		auto* StateMachine = StateMachineRunner->GetStateMachine();
 
-		auto* InitialState = StateMachine->GetCurrentState();
+		auto* InitialState = StateMachine->GetCurrentNode();
 		InitialState->RequestReturn();
 
 		TestFalse(TEXT("StateMachine is running"), StateMachine->IsRunning());
@@ -227,7 +227,7 @@ void FStateMachineTests::Define()
 
 		auto* StateMachine = StateMachineRunner->GetStateMachine();
 
-		auto* InitialState = StateMachine->GetCurrentState();
+		auto* InitialState = StateMachine->GetCurrentNode();
 		InitialState->RequestExit(TEXT("A"));
 
 		InitialState->RequestReturn();
