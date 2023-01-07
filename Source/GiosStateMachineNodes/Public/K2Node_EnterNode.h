@@ -22,7 +22,9 @@ class GIOSSTATEMACHINENODES_API UK2Node_EnterNode : public UK2Node_GiosStateMach
 public:
 	virtual void AllocateDefaultPins() override;
 
-	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override { return FText::FromString(TEXT("Enter Node")); }
+	virtual FText GetNodeTitle(ENodeTitleType::Type TitleType) const override;
+
+	virtual FLinearColor GetNodeTitleColor() const override;
 
 	virtual void ReallocatePinsDuringReconstruction(TArray<UEdGraphPin*>& OldPins) override;
 	
@@ -48,4 +50,6 @@ private:
 	UK2Node_CustomEvent* CreateExitEventNode(FKismetCompilerContext& CompilerContext, UEdGraph* SourceGraph, const FName& StateClassName );
 	
 	UEdGraphPin* GetClassPin() const;
+
+	TOptional<UClass*> GetCurrentNodeClass() const;
 };

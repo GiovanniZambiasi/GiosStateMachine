@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GiosStateMachineNodes.h"
 #include "K2Node.h"
 #include "GiosStateMachines.h"
 #include "K2Node_GiosStateMachineNode.generated.h"
@@ -17,5 +18,5 @@ public:
 	
 	virtual FText GetMenuCategory() const override { return FText::FromString(GIOS_STATEMACHINES_CATEGORY); }
 
-	virtual FLinearColor GetNodeTitleColor() const override { return FLinearColor(.8f, .2f, .0f); }
+	virtual FLinearColor GetNodeTitleColor() const override { return GiosStateMachineNodes::DefaultColor; }
 };

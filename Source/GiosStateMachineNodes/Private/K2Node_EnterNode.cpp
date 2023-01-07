@@ -29,6 +29,54 @@ void UK2Node_EnterNode::AllocateDefaultPins()
 	ClassPin->bNotConnectable = true;
 }
 
+FText UK2Node_EnterNode::GetNodeTitle(ENodeTitleType::Type TitleType) const
+{
+	TOptional<UClass*> CurrentNodeClass = GetCurrentNodeClass();
+
+	if(CurrentNodeClass)
+	{
+		UClass* Class = CurrentNodeClass.GetValue();
+
+		if(Class != nullptr)
+		{
+			if(Class->IsChildOf(UGioStateMachine::StaticClass()))
+			{
+				return FText::FromString(FString::Printf(TEXT("Enter State Machine (%s)"), *Class->GetDisplayNameText().ToString()));
+			}
+			
+			return FText::FromString(FString::Printf(TEXT("Enter Node (%s)"), *Class->GetDisplayNameText().ToString()));
+		}
+		
+		return FText::FromString(FString::Printf(TEXT("Enter Node (dynamic)")));
+	}
+	
+	return FText::FromString(FString::Printf(TEXT("Enter Node")));
+}
+
+FLinearColor UK2Node_EnterNode::GetNodeTitleColor() const
+{
+	TOptional<UClass*> CurrentNodeClass = GetCurrentNodeClass();
+
+	if(!CurrentNodeClass)
+	{
+		return Super::GetNodeTitleColor();
+	}
+	
+	UClass* Class = CurrentNodeClass.GetValue();
+
+	if(Class == nullptr)
+	{
+		return Super::GetNodeTitleColor();
+	}
+	
+	if(Class->IsChildOf(UGioStateMachine::StaticClass()))
+	{
+		return GiosStateMachineNodes::StateMachineColor;
+	}
+
+	return Super::GetNodeTitleColor();
+}
+
 void UK2Node_EnterNode::ReallocatePinsDuringReconstruction(TArray<UEdGraphPin*>& OldPins)
 {
 	Super::ReallocatePinsDuringReconstruction(OldPins);
@@ -62,15 +110,14 @@ void UK2Node_EnterNode::PinDefaultValueChanged(UEdGraphPin* Pin)
 
 UObject* UK2Node_EnterNode::GetJumpTargetForDoubleClick() const
 {
-	auto ClassPin = GetClassPin();
-	auto Class = Cast<UClass>(ClassPin->DefaultObject);
+	auto Class = GetCurrentNodeClass();
 
-	if (Class == nullptr)
+	if (!Class.IsSet() || Class.GetValue() == nullptr)
 	{
 		return nullptr;
 	}
 
-	if(auto BlueprintClass = Cast<UBlueprintGeneratedClass>(Class))
+	if(auto BlueprintClass = Cast<UBlueprintGeneratedClass>(Class.GetValue()))
 	{
 		return BlueprintClass->ClassGeneratedBy;
 	}
@@ -258,6 +305,31 @@ void UK2Node_EnterNode::ExpandOutputPins(FKismetCompilerContext& CompilerContext
 UEdGraphPin* UK2Node_EnterNode::GetClassPin() const
 {
 	return FindPinChecked(ClassPinName);
+}
+
+TOptional<UClass*> UK2Node_EnterNode::GetCurrentNodeClass() const
+{
+	TOptional<UClass*> Result{};
+	auto ClassPin = FindPin(ClassPinName);
+
+	if(ClassPin)
+	{
+		if(auto Class = Cast<UClass>(ClassPin->DefaultObject))
+		{
+			Result.Emplace(Class);
+			return Result;
+		}
+
+		if(ClassPin->LinkedTo.IsEmpty())
+		{
+			return Result;
+		}
+
+		Result.Emplace(nullptr);
+		return Result;
+	}
+
+	return Result;
 }
 
 #undef LOCTEXT_NAMESPACE
