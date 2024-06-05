@@ -11,7 +11,7 @@ BEGIN_DEFINE_SPEC(FStateMachineTests, TEXT("GioStateMachine"),
                   EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
 
 	UWorld* Map;
-	UStateMachineRunnerComponent* StateMachineRunner;
+	UGioStateMachineRunnerComponent* StateMachineRunner;
 
 	void LoadMap(const FString& MapPath)
 	{
@@ -71,8 +71,8 @@ void FStateMachineTests::Define()
 		LoadMap(FGioTestUtils::EmptyTestSceneName);
 
 		auto* Actor = Map->SpawnActor<AActor>();
-		StateMachineRunner = Cast<UStateMachineRunnerComponent>(
-			Actor->AddComponentByClass(UStateMachineRunnerComponent::StaticClass(), false, FTransform{}, true));
+		StateMachineRunner = Cast<UGioStateMachineRunnerComponent>(
+			Actor->AddComponentByClass(UGioStateMachineRunnerComponent::StaticClass(), false, FTransform{}, true));
 	});
 
 	It(TEXT("GivenStateMachine_WhenExitThroughA_EntersStateA"), [this]

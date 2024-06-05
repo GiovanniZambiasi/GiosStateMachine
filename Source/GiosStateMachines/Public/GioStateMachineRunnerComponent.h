@@ -9,7 +9,7 @@
 class UGioStateMachine;
 
 UCLASS( ClassGroup=("Gio's State Machines"), meta=(BlueprintSpawnableComponent) )
-class GIOSSTATEMACHINES_API UStateMachineRunnerComponent : public UActorComponent
+class GIOSSTATEMACHINES_API UGioStateMachineRunnerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -20,7 +20,7 @@ class GIOSSTATEMACHINES_API UStateMachineRunnerComponent : public UActorComponen
 	UGioStateMachine* StateMachine;
 	
 public:	
-	UStateMachineRunnerComponent();
+	UGioStateMachineRunnerComponent();
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
