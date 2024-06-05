@@ -2,7 +2,7 @@
 #include "GiosStateMachineTests.h"
 #include "GioNode.h"
 #include "GioStateMachine.h"
-#include "StateMachineRunnerComponent.h"
+#include "GioStateMachineRunnerComponent.h"
 #include "Engine/AssetManager.h"
 #include "Misc/AutomationTest.h"
 #include "Tests/AutomationCommon.h"

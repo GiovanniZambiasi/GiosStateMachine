@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GioNode.h"
 #include "GioStateMachineData.h"
-#include "StateActivation.h"
+#include "GioStateActivation.h"
 #include "GioStateMachine.generated.h"
 
 class UGioStateMachineData;
@@ -34,9 +34,9 @@ class GIOSSTATEMACHINES_API UGioStateMachine : public UGioNode
 	TSubclassOf<UGioStateMachineData> DataType = UGioStateMachineData::StaticClass();
 
 	UPROPERTY()
-	FStateActivation CurrentActivation{};
+	FGioStateActivation CurrentActivation{};
 
-	TArray<FStateActivation> StateHistory{};
+	TArray<FGioStateActivation> StateHistory{};
 	
 public:
 	virtual void Enter(const FName& Input) override;
@@ -59,7 +59,7 @@ protected:
 	virtual UGioStateMachineData* GetDataForNewNode() const { return GetData(); }
 	
 private:
-	void SetCurrentActivation(const FStateActivation& Activation);
+	void SetCurrentActivation(const FGioStateActivation& Activation);
 	
 	void HandleNodeExitRequest(UGioNode* Context, const FName& Output);
 

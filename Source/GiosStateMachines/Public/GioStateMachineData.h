@@ -12,8 +12,8 @@
  * created when a state machine is entered, and the instance will be shared with all its child nodes. This enables two
  * separate nodes in the state machine to communicate, with a level of abstraction between them.
 */
-UCLASS(Blueprintable, BlueprintType)
-class GIOSSTATEMACHINES_API UGioStateMachineData : public UObject
+UCLASS(Blueprintable)
+class GIOSSTATEMACHINES_API UGioStateMachineData : public UDataAsset
 {
 	GENERATED_BODY()
 };

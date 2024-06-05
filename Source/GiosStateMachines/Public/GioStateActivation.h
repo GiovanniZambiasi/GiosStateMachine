@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "StateActivation.generated.h"
+#include "GioStateActivation.generated.h"
 
 class UGioNode;
 
 USTRUCT()
-struct FStateActivation
+struct FGioStateActivation
 {
 	GENERATED_BODY()
 

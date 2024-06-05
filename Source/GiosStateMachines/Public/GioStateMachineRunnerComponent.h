@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "StateMachineRunnerComponent.generated.h"
+#include "GioStateMachineRunnerComponent.generated.h"
 
 class UGioStateMachine;
 

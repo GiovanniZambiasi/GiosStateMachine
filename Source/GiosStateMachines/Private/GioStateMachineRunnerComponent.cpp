@@ -1,9 +1,7 @@
 // Copyright MiddleMast. All rights reserved
 
-#include "StateMachineRunnerComponent.h"
-
+#include "GioStateMachineRunnerComponent.h"
 #include "GiosStateMachines.h"
-#include "GioNode.h"
 #include "GioStateMachine.h"
 
 UStateMachineRunnerComponent::UStateMachineRunnerComponent()

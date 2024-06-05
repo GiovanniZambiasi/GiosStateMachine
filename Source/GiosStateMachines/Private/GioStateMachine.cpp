@@ -36,7 +36,7 @@ void UGioStateMachine::EnterNewNode(UClass* NodeClass, FName Input, const FNodeE
 	State->OnExitRequested().AddUObject(this, &ThisClass::HandleNodeExitRequest);
 	State->OnReturnRequested().AddUObject(this, &ThisClass::HandleNodeReturnRequest);
 	State->SetData(GetDataForNewNode());
-	auto Activation = FStateActivation{State, MakeShared<FNodeExitHandler>(ExitHandler)};
+	auto Activation = FGioStateActivation{State, MakeShared<FNodeExitHandler>(ExitHandler)};
 	SetCurrentActivation(Activation);
 	StateHistory.Add(Activation);
 	ensure(State->GetInputs().Contains(Input));
@@ -56,7 +56,7 @@ UGioStateMachineData* UGioStateMachine::CreateData()
 	return NewObject<UGioStateMachineData>(this, DataType);
 }
 
-void UGioStateMachine::SetCurrentActivation(const FStateActivation& Activation)
+void UGioStateMachine::SetCurrentActivation(const FGioStateActivation& Activation)
 {
 	CurrentActivation = Activation;
 }
@@ -103,11 +103,11 @@ void UGioStateMachine::HandleNodeReturnRequest(UGioNode* Context)
 
 	if(StateHistory.Num() == 0)
 	{
-		CurrentActivation = FStateActivation{};
+		CurrentActivation = FGioStateActivation{};
 		return;
 	}
 	
-	FStateActivation PreviousState = StateHistory.Last();
+	FGioStateActivation PreviousState = StateHistory.Last();
 	check(PreviousState.IsValid())
 	SetCurrentActivation(PreviousState);
 	PreviousState.Node->Returned();
