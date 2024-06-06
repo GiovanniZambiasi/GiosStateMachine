@@ -13,14 +13,14 @@ class GIOSSTATEMACHINES_API UGioStateMachineRunnerComponent : public UActorCompo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(Category="Gio's State Machines", EditAnywhere)
 	TSubclassOf<UGioStateMachine> StateMachineClass{};
 
 	/**
 	 * If this component should automatically run the state machine on BeginPlay. If false, the StateMachine instance
 	 * will be created anyway, and can be run via the RunStateMachine method
 	 */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(Category="Gio's State Machines", EditDefaultsOnly)
 	bool bAutoRun{true};
 	
 	UPROPERTY()
@@ -40,6 +40,8 @@ public:
 	void CreateStateMachine(TSubclassOf<UGioStateMachine> Class);
 
 	void RunStateMachine();
+	
+	void SetAutoRun(bool bValue);
 	
 protected:
 	virtual void BeginPlay() override;
