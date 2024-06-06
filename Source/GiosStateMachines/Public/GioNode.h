@@ -94,6 +94,12 @@ public:
 
 	UGioStateMachineData* GetData() const { return StateMachineData; }
 	
+	template<typename TData>
+	TData* GetDataChecked()
+	{
+		return CastChecked<TData>(StateMachineData);
+	}
+	
 protected:
 	UFUNCTION(BlueprintImplementableEvent, DisplayName="OnEntered")
 	void K2_OnEntered(const FName& Input);
