@@ -39,6 +39,7 @@ class GIOSSTATEMACHINES_API UGioStateMachine : public UGioNode
 	UPROPERTY()
 	TMap<const UClass*, UGioNode*> NodePool{};
 	
+	UPROPERTY()
 	TArray<FGioStateActivation> StateHistory{};
 	
 public:
@@ -47,15 +48,15 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UGioNode* GetCurrentNode() const { return CurrentActivation.Node; }
 
+	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly)
+	void EnterNewNode(UClass* NodeClass, FName Input, FString NodeGuid, const FNodeExitHandler& ExitHandler);
+	
 	virtual void Tick(const float& DeltaTime) override;
 
 	bool IsRunning() const { return CurrentActivation.IsValid(); }
 	
 protected:
 	virtual void OnEntered(const FName& Input) override;
-	
-	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly)
-	void EnterNewNode(UClass* NodeClass, FName Input, FString NodeGuid, const FNodeExitHandler& ExitHandler);
 
 	virtual UGioStateMachineData* CreateData();
 

@@ -81,11 +81,13 @@ void UGioStateMachine::HandleNodeExitRequest(UGioNode* Context, const FName& Out
 	}
 
 	LOG_GIOS_STATEMACHINES(Display, TEXT("StateMachine received exit request through %s"), *Output.ToString());
+
+	UGioNode* PreviousState = CurrentActivation.Node;
+
+	CurrentActivation.ExitHandler->ExecuteIfBound(Output);
+
+	PreviousState->OnExited(Output);
 	
-	auto PreviousState = CurrentActivation.Node;
-
-	CurrentActivation.ExitHandler->Execute(Output);
-
 	if(CurrentActivation.Node == PreviousState)
 	{
 		LOG_GIOS_STATEMACHINES(Warning, TEXT("State '%s' requested exit '%s', but no transition was made.\n\nIs there a transition setup for the requested output?"),

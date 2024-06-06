@@ -1,4 +1,5 @@
 ﻿#include "EngineUtils.h"
+#include "GioHumbleNode.h"
 #include "GiosStateMachineTests.h"
 #include "GioNode.h"
 #include "GioStateMachine.h"
@@ -57,6 +58,18 @@ BEGIN_DEFINE_SPEC(FStateMachineTests, TEXT("GioStateMachine"),
 		}
 
 		return false;
+	}
+
+	template<typename TNode>
+	TNode* RunCustomNode(UClass* NodeClass)
+	{
+		UGioStateMachine* StateMachine = StateMachineRunner->GetStateMachine();
+		check(StateMachine)
+		FNodeExitHandler H{};
+		StateMachine->EnterNewNode(UGioHumbleNode::StaticClass(), FName{TEXT("Default")}, FGuid::NewGuid().ToString(), H);
+		TNode* Node = Cast<TNode>(StateMachine->GetCurrentNode());
+		TestNotNull(FString::Printf(TEXT("Failed to create empty state machine with node class %s"), *NodeClass->GetName()), Node);
+		return Node;
 	}
 
 END_DEFINE_SPEC(FStateMachineTests)
@@ -171,21 +184,21 @@ void FStateMachineTests::Define()
 	});
 
 	It(TEXT("WhenInvalidContextRequestsExiit_ErrorIsLogged"), [this]
+	{
+		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
 		{
-			if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
-			{
-				return;
-			}
-		
-			AddExpectedError(TEXT("invalid context"), EAutomationExpectedErrorFlags::Contains);
-		
-			auto* StateMachine = StateMachineRunner->GetStateMachine();
+			return;
+		}
 
-			auto* InitialState = StateMachine->GetCurrentNode();
-			InitialState->RequestExit(TEXT("A"));
-			InitialState->RequestExit(TEXT("A"));
-		});
-	
+		AddExpectedError(TEXT("invalid context"), EAutomationExpectedErrorFlags::Contains);
+
+		auto* StateMachine = StateMachineRunner->GetStateMachine();
+
+		auto* InitialState = StateMachine->GetCurrentNode();
+		InitialState->RequestExit(TEXT("A"));
+		InitialState->RequestExit(TEXT("A"));
+	});
+
 	It(TEXT("WhenStateReturned_ReturnsToPreviousState"), [this]
 	{
 		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
@@ -247,16 +260,47 @@ void FStateMachineTests::Define()
 		UGioStateMachineData* OriginalData = StateMachine->GetData();
 		UGioStateMachine* InnerStateMachine = Cast<UGioStateMachine>(StateMachine->GetCurrentNode());
 
-		if(!TestNotNull(TEXT("Inner state machine entered"), InnerStateMachine))
+		if (!TestNotNull(TEXT("Inner state machine entered"), InnerStateMachine))
 			return;
 
 		UGioStateMachineData* InnerData = InnerStateMachine->GetData();
 		TestTrue(TEXT("Data is the same"), OriginalData != nullptr && OriginalData == InnerData);
 	});
+
+	It(TEXT("EnterAndExitCallbacksReceived"), [this]
+	{
+		StateMachineRunner->RunStateMachine(UGioStateMachine::StaticClass());
+		UGioHumbleNode* Node = RunCustomNode<UGioHumbleNode>(UGioHumbleNode::StaticClass());
+
+		if(!TestNotNull(TEXT("Node not null"), Node))
+			return;
+
+		TestTrue(TEXT("Enter callback received"), Node->bEntered);
+		AddExpectedMessage(TEXT("no transition was made"), ELogVerbosity::Type::Warning);
+		Node->RequestExit(FName{TEXT("Default")});
+		TestTrue(TEXT("Exit callback received"), Node->bExited);
+	});
+
+	It(TEXT("ReturnCallbackReceived"), [this]
+		{
+			StateMachineRunner->RunStateMachine(UGioStateMachine::StaticClass());
+			UGioHumbleNode* First = RunCustomNode<UGioHumbleNode>(UGioHumbleNode::StaticClass());
+
+			if(!First)
+				return;
+
+			UGioNode* NewNode = RunCustomNode<UGioNode>(UGioNode::StaticClass());
+		
+			if(!NewNode)
+				return;
+		
+			NewNode->RequestReturn();
+			TestTrue(TEXT("Return callback received"), First->bReturned);
+		});
 	
 	AfterEach([this]
 	{
-		if(StateMachineRunner && Map)
+		if (StateMachineRunner && Map)
 		{
 			Map->DestroyActor(StateMachineRunner->GetOwner());
 			StateMachineRunner = nullptr;
