@@ -27,6 +27,11 @@ void UGioStateMachineRunnerComponent::RunStateMachine()
 	StateMachine->EnterViaFirstInput();
 }
 
+void UGioStateMachineRunnerComponent::SetAutoRun(bool bValue)
+{
+	bAutoRun = bValue;
+}
+
 void UGioStateMachineRunnerComponent::BeginPlay()
 {
 	Super::BeginPlay();
