@@ -44,7 +44,7 @@ class GIOSSTATEMACHINES_API UGioNode : public UObject
 	UPROPERTY(EditDefaultsOnly, Category="Gio's StateMachines")
 	TArray<FName> Outputs = { TEXT("Default") };
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, meta=(AllowPrivateAccess))
 	UGioStateMachineData* StateMachineData = nullptr;
 	
 	FNodeExitRequestHandler ExitRequestedEvent{};
@@ -59,22 +59,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void SetData(UGioStateMachineData* Data);
 	
-	virtual void Enter(const FName& Input);
+	void Enter(const FName& Input);
 	
 	virtual void Tick(const float& DeltaTime);
-	
-	/**
-	 * @brief Called when the state machine returns to this node from another node
-	 * <br><br>
-	 * <i>This a response to a call to RequestReturn() from another state in the owning StateMachine</i>
-	 */
-	virtual void Returned();
 
 	/**
 	 * @brief Requests an exit via the Output pin to it's owning StateMachine
 	 */
 	UFUNCTION(BlueprintCallable)
-	virtual void RequestExit(FName Output);
+	void RequestExit(FName Output);
 
 	/**
 	 * @brief Requests a return to the previous node in the owning StateMachine's history
@@ -82,8 +75,19 @@ public:
 	 * <i>If the history is empty, stops the state machine from running</i>
 	 */
 	UFUNCTION(BlueprintCallable)
-	virtual void RequestReturn();
+	void RequestReturn();
+
+	virtual void OnEntered(const FName& Input) { }
+
+	virtual void OnExited(const FName& Output) { }
 	
+	/**
+	 * @brief Called when the state machine returns to this node from another node
+	 * <br><br>
+	 * <i>This a response to a call to RequestReturn() from another state in the owning StateMachine</i>
+	 */
+	virtual void OnReturned();
+
 	virtual const TArray<FName>& GetInputs() const { return Inputs; }
 	
 	virtual const TArray<FName>& GetOutputs() const { return Outputs; }
@@ -91,11 +95,14 @@ public:
 	UGioStateMachineData* GetData() const { return StateMachineData; }
 	
 protected:
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnEntered(const FName& Input);
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="OnEntered")
+	void K2_OnEntered(const FName& Input);
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnReturned();
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="OnReturned")
+	void K2_OnReturned();
+
+	UFUNCTION(BlueprintImplementableEvent, DisplayName="OnTick")
+	void K2_OnTick(float DeltaTime);
 	
 	void AddInputs(const TArray<FName>& InputNames)	{ Inputs.Append(InputNames); }
 

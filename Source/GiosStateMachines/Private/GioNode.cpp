@@ -25,6 +25,7 @@ void UGioNode::Enter(const FName& Input)
 {
 	LOG_GIOS_STATEMACHINES(Display, TEXT("%s entered via '%s'"), *GetName(), *Input.ToString());
 	OnEntered(Input);
+	K2_OnEntered(Input);
 }
 
 void UGioNode::SetInputs(const TArray<FName>& InputNames)
@@ -53,12 +54,13 @@ void UGioNode::RequestReturn()
 
 void UGioNode::Tick(const float& DeltaTime)
 {
+	K2_OnTick(DeltaTime);
 }
 
-void UGioNode::Returned()
+void UGioNode::OnReturned()
 {
 	LOG_GIOS_STATEMACHINES(Display, TEXT("%s has been returned to"), *GetName())
-	OnReturned();
+	K2_OnReturned();
 }
 
 void UGioNode::RemoveProtectedNames(TArray<FName>& Names, const TSet<FName>& ProtectedNames)

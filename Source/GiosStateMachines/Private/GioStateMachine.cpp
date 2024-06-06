@@ -3,16 +3,7 @@
 #include "GioStateMachine.h"
 #include "GioNode.h"
 #include "GiosStateMachines.h"
-
-void UGioStateMachine::Enter(const FName& Input)
-{
-	if(GetData() == nullptr)
-	{
-		SetData(CreateData());
-	}
-	
-	Super::Enter(Input);
-}
+#include "Kismet/KismetGuidLibrary.h"
 
 void UGioStateMachine::EnterViaFirstInput()
 {
@@ -23,32 +14,45 @@ void UGioStateMachine::EnterViaFirstInput()
 	}
 }
 
-void UGioStateMachine::EnterNewNode(UClass* NodeClass, FName Input, const FNodeExitHandler& ExitHandler)
+void UGioStateMachine::Tick(const float& DeltaTime)
 {
-	LOG_GIOS_STATEMACHINES(Display, TEXT("%s entering state %s"), *GetName(), *NodeClass->GetName());
+	Super::Tick(DeltaTime);
+	
+	if(CurrentActivation.IsValid())
+	{
+		CurrentActivation.Node->Tick(DeltaTime);
+	}
+}
+
+void UGioStateMachine::OnEntered(const FName& Input)
+{
+	Super::OnEntered(Input);
+	
+	if(GetData() == nullptr)
+	{
+		SetData(CreateData());
+	}
+}
+
+void UGioStateMachine::EnterNewNode(UClass* NodeClass, FName Input, FString NodeGuid, const FNodeExitHandler& ExitHandler)
+{
+	LOG_GIOS_STATEMACHINES(Display, TEXT("%s entering state %s [GUID:%s]"), *GetName(), *NodeClass->GetName(), *NodeGuid);
 	
 	if(!ensureMsgf(NodeClass->IsChildOf(UGioNode::StaticClass()), TEXT("'%s' is not a subclass of '%s'. Cannot enter state"), *NodeClass->GetName(), *UGioNode::StaticClass()->GetName()))
 	{
 		return;
 	}
 
-	auto* State = NewObject<UGioNode>(this, NodeClass);
-	State->OnExitRequested().AddUObject(this, &ThisClass::HandleNodeExitRequest);
-	State->OnReturnRequested().AddUObject(this, &ThisClass::HandleNodeReturnRequest);
-	State->SetData(GetDataForNewNode());
-	auto Activation = FGioStateActivation{State, MakeShared<FNodeExitHandler>(ExitHandler)};
+	FGuid ParsedGuid{};
+	bool bResult{};
+	UKismetGuidLibrary::Parse_StringToGuid(NodeGuid, ParsedGuid, bResult);
+	check(bResult)
+	UGioNode* Node = FindOrMakeNode(NodeClass);
+	auto Activation = FGioStateActivation{Node, ParsedGuid, MakeShared<FNodeExitHandler>(ExitHandler)};
 	SetCurrentActivation(Activation);
 	StateHistory.Add(Activation);
-	ensure(State->GetInputs().Contains(Input));
-	State->Enter(Input);
-}
-
-void UGioStateMachine::Tick(const float& DeltaTime)
-{
-	if(CurrentActivation.IsValid())
-	{
-		CurrentActivation.Node->Tick(DeltaTime);
-	}
+	ensure(Node->GetInputs().Contains(Input));
+	Node->Enter(Input);
 }
 
 UGioStateMachineData* UGioStateMachine::CreateData()
@@ -110,5 +114,20 @@ void UGioStateMachine::HandleNodeReturnRequest(UGioNode* Context)
 	FGioStateActivation PreviousState = StateHistory.Last();
 	check(PreviousState.IsValid())
 	SetCurrentActivation(PreviousState);
-	PreviousState.Node->Returned();
+	PreviousState.Node->OnReturned();
+}
+
+UGioNode* UGioStateMachine::FindOrMakeNode(const UClass* NodeClass)
+{
+	if(UGioNode** Node = NodePool.Find(NodeClass))
+	{
+		return *Node;
+	}
+
+	UGioNode* Node = NewObject<UGioNode>(this, NodeClass);
+	Node->OnExitRequested().AddUObject(this, &ThisClass::HandleNodeExitRequest);
+	Node->OnReturnRequested().AddUObject(this, &ThisClass::HandleNodeReturnRequest);
+	Node->SetData(GetDataForNewNode());
+	NodePool.Add(NodeClass, Node);
+	return Node;
 }

@@ -58,7 +58,7 @@ void UK2Node_NodeEntered::ExpandNode(FKismetCompilerContext& CompilerContext, UE
 	const auto* Schema = Cast<UEdGraphSchema_K2>(GetSchema());
 	
 	auto* StateEnteredNode = CompilerContext.SpawnIntermediateNode<UK2Node_Event>(this, SourceGraph);
-	StateEnteredNode->EventReference.SetExternalMember(TEXT("OnEntered"), UGioNode::StaticClass());
+	StateEnteredNode->EventReference.SetExternalMember(TEXT("K2_OnEntered"), UGioNode::StaticClass());
 	StateEnteredNode->bOverrideFunction = true;
 	StateEnteredNode->AllocateDefaultPins();
 

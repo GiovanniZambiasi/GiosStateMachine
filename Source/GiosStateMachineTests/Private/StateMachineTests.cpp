@@ -64,6 +64,9 @@ END_DEFINE_SPEC(FStateMachineTests)
 const FString TransitionTestStateMachinePath = TEXT(
 	"Blueprint'/GiosStateMachines/Tests/Transition/BP_TransitionTestStateMachine.BP_TransitionTestStateMachine'");
 
+const FString NestedStateMachinePath = TEXT(
+	"Blueprint'/GiosStateMachines/Tests/NestedSM/BP_NestedSMTest.BP_NestedSMTest'");
+
 void FStateMachineTests::Define()
 {
 	BeforeEach([this]
@@ -75,7 +78,7 @@ void FStateMachineTests::Define()
 			Actor->AddComponentByClass(UGioStateMachineRunnerComponent::StaticClass(), false, FTransform{}, true));
 	});
 
-	It(TEXT("GivenStateMachine_WhenExitThroughA_EntersStateA"), [this]
+	It(TEXT("WhenExitThroughA_EntersStateA"), [this]
 	{
 		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
 		{
@@ -92,7 +95,7 @@ void FStateMachineTests::Define()
 		TestEqual(TEXT("State is A"), CurrentState->GetClass()->GetName(), FString{TEXT("BP_StateA_C")});
 	});
 
-	It(TEXT("GivenStateMachine_WhenExitThroughB_EntersStateB"), [this]
+	It(TEXT("WhenExitThroughB_EntersStateB"), [this]
 	{
 		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
 		{
@@ -109,7 +112,7 @@ void FStateMachineTests::Define()
 		TestEqual(TEXT("State is B"), CurrentState->GetClass()->GetName(), FString{TEXT("BP_StateB_C")});
 	});
 
-	It(TEXT("GivenStateMachine_WhenExitThroughInvalidOutput_LogsWarning"), [this]
+	It(TEXT("WhenExitThroughInvalidOutput_LogsWarning"), [this]
 	{
 		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
 		{
@@ -124,7 +127,7 @@ void FStateMachineTests::Define()
 		InitialState->RequestExit(TEXT("C"));
 	});
 
-	It(TEXT("GivenStateMachine_WhenRan_CreatesDataObject"), [this]
+	It(TEXT("WhenRan_CreatesDataObject"), [this]
 	{
 		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
 		{
@@ -136,7 +139,7 @@ void FStateMachineTests::Define()
 		TestNotNull(TEXT("StateMachineData is not null"), StateMachine->GetData());
 	});
 
-	It(TEXT("GivenStateMachine_WhenRan_SetDataOnState"), [this]
+	It(TEXT("WhenRan_SetDataOnState"), [this]
 	{
 		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
 		{
@@ -150,7 +153,7 @@ void FStateMachineTests::Define()
 		TestNotNull(TEXT("StateMachineData is not null"), InitialState->GetData());
 	});
 
-	It(TEXT("GivenStateMachine_WhenTransitions_SetDataOnNewState"), [this]
+	It(TEXT("WhenTransitions_SetDataOnNewState"), [this]
 	{
 		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
 		{
@@ -167,7 +170,7 @@ void FStateMachineTests::Define()
 		TestNotNull(TEXT("StateMachineData is not null"), NewState->GetData());
 	});
 
-	It(TEXT("GivenStateMachine_WhenInvalidContextRequestsExiit_ErrorIsLogged"), [this]
+	It(TEXT("WhenInvalidContextRequestsExiit_ErrorIsLogged"), [this]
 		{
 			if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
 			{
@@ -183,7 +186,7 @@ void FStateMachineTests::Define()
 			InitialState->RequestExit(TEXT("A"));
 		});
 	
-	It(TEXT("GivenStateMachine_WhenStateReturned_ReturnsToPreviousState"), [this]
+	It(TEXT("WhenStateReturned_ReturnsToPreviousState"), [this]
 	{
 		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
 		{
@@ -201,7 +204,7 @@ void FStateMachineTests::Define()
 		TestEqual(TEXT("Current state is InitialState"), StateMachine->GetCurrentNode(), InitialState);
 	});
 
-	It(TEXT("GivenStateMachine_WhenInitialStateReturns_StateMachineStops"), [this]
+	It(TEXT("WhenInitialStateReturns_StateMachineStops"), [this]
 	{
 		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
 		{
@@ -216,7 +219,7 @@ void FStateMachineTests::Define()
 		TestFalse(TEXT("StateMachine is running"), StateMachine->IsRunning());
 	});
 
-	It(TEXT("GivenStateMachine_WhenInvalidContextRequestsReturn_ErrorIsLogged"), [this]
+	It(TEXT("WhenInvalidContextRequestsReturn_ErrorIsLogged"), [this]
 	{
 		if (!LoadAndRunStateMachine(TransitionTestStateMachinePath))
 		{
@@ -232,10 +235,31 @@ void FStateMachineTests::Define()
 
 		InitialState->RequestReturn();
 	});
+
+	It(TEXT("WhenNestedStateMachineEntered_StateMachineDataIsSet"), [this]
+	{
+		if (!LoadAndRunStateMachine(NestedStateMachinePath))
+		{
+			return;
+		}
+
+		UGioStateMachine* StateMachine = StateMachineRunner->GetStateMachine();
+		UGioStateMachineData* OriginalData = StateMachine->GetData();
+		UGioStateMachine* InnerStateMachine = Cast<UGioStateMachine>(StateMachine->GetCurrentNode());
+
+		if(!TestNotNull(TEXT("Inner state machine entered"), InnerStateMachine))
+			return;
+
+		UGioStateMachineData* InnerData = InnerStateMachine->GetData();
+		TestTrue(TEXT("Data is the same"), OriginalData != nullptr && OriginalData == InnerData);
+	});
 	
 	AfterEach([this]
 	{
-		FGioTestUtils::Exit(Map);
-		Map = nullptr;
+		if(StateMachineRunner && Map)
+		{
+			Map->DestroyActor(StateMachineRunner->GetOwner());
+			StateMachineRunner = nullptr;
+		}
 	});
 }

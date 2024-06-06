@@ -12,6 +12,8 @@
 #include "K2Node_SwitchName.h"
 #include "KismetCompiler.h"
 #include "GioStateMachine.h"
+#include "K2Node_MakeStruct.h"
+#include "K2Node_MakeVariable.h"
 
 #define LOCTEXT_NAMESPACE "K2Node_EnterState"
 
@@ -236,6 +238,7 @@ void UK2Node_EnterNode::ExpandInputPin(FKismetCompilerContext& CompilerContext, 
 {
 	static const FName StateClassParamName = TEXT("NodeClass");
 	static const FName InputParamName = TEXT("Input");
+	static const FName GuidParamName = TEXT("NodeGuid");
 	static const FName NodeExitRequestHandlerParamName = TEXT("ExitHandler");
 	static const FName EnterNodeFunctionName = TEXT("EnterNewNode");
 
@@ -262,6 +265,9 @@ void UK2Node_EnterNode::ExpandInputPin(FKismetCompilerContext& CompilerContext, 
 	auto* InputParamPin = CallNode->FindPinChecked(InputParamName);
 	InputParamPin->DefaultValue = InputPin->GetName();
 
+	auto* GuidParamPin = CallNode->FindPinChecked(GuidParamName);
+	GuidParamPin->DefaultValue = NodeGuid.ToString(); 
+	
 	auto* StateExitHandlerPin = CallNode->FindPinChecked(NodeExitRequestHandlerParamName);
 	verify(Schema->TryCreateConnection(StateExitHandlerPin, OutputDelegatePin));
 

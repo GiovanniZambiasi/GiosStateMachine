@@ -15,6 +15,9 @@ struct FGioStateActivation
 	UPROPERTY()
 	UGioNode* Node;
 
+	UPROPERTY()
+	FGuid NodeGuid{};
+
 	TSharedPtr<class FNodeExitHandler> ExitHandler;
 
 	bool IsValid() const { return Node != nullptr; };
