@@ -12,6 +12,8 @@ class UGioStateMachineData;
 
 DECLARE_DYNAMIC_DELEGATE_OneParam(FNodeExitHandler, FName, Output);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FStateMachineDataCreatedDelegate, UGioStateMachineData* /*InData*/)
+
 /**
  * @brief The state machine is a Node which contains child nodes (states). There will always be only one node active at
  * a time, and it will be Ticked along with the state machine. The state machine also has a property to define what
@@ -41,8 +43,12 @@ class GIOSSTATEMACHINES_API UGioStateMachine : public UGioNode
 	
 	UPROPERTY()
 	TArray<FGioStateActivation> StateHistory{};
+
+	FStateMachineDataCreatedDelegate DataCreated{};
 	
 public:
+	FStateMachineDataCreatedDelegate& OnDataCreated() { return DataCreated; }
+	
 	void EnterViaFirstInput();
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -50,6 +56,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintInternalUseOnly)
 	void EnterNewNode(UClass* NodeClass, FName Input, FString NodeGuid, const FNodeExitHandler& ExitHandler);
+
+	virtual UGioStateMachineData* CreateData();
 	
 	virtual void Tick(const float& DeltaTime) override;
 
@@ -57,8 +65,6 @@ public:
 	
 protected:
 	virtual void OnEntered(const FName& Input) override;
-
-	virtual UGioStateMachineData* CreateData();
 
 	virtual UGioStateMachineData* GetDataForNewNode() const { return GetData(); }
 	

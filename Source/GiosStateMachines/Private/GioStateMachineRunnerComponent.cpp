@@ -10,15 +10,41 @@ UGioStateMachineRunnerComponent::UGioStateMachineRunnerComponent()
 	StateMachineClass = UGioStateMachine::StaticClass();
 }
 
+void UGioStateMachineRunnerComponent::CreateStateMachine(TSubclassOf<UGioStateMachine> Class)
+{
+	StateMachine = NewObject<UGioStateMachine>(this, Class);
+	checkf(StateMachine, TEXT("%s's 'CreateStateMachine' function did not create a valid state machine. Make sure to set the StateMachineClass"), *GetNameSafe(GetOwner()))
+}
+
+void UGioStateMachineRunnerComponent::RunStateMachine()
+{
+	if(!StateMachine)
+	{
+		LOG_GIOS_STATEMACHINES(Error, TEXT("%s tried to run StateMachine, but it's invalid"), *GetName())
+		return;
+	}
+
+	StateMachine->EnterViaFirstInput();
+}
+
 void UGioStateMachineRunnerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
 	LOG_GIOS_STATEMACHINES(Display, TEXT("Component beginplay"))
 	
-	if(StateMachineClass != nullptr)
+	if(StateMachineClass == nullptr)
 	{
-		RunStateMachine(StateMachineClass);
+		return;
+	}
+
+	if(bAutoRun)
+	{
+		CreateAndRunStateMachine(StateMachineClass);
+	}
+	else
+	{
+		CreateStateMachine(StateMachineClass);
 	}
 }
 
@@ -32,9 +58,8 @@ void UGioStateMachineRunnerComponent::TickComponent(float DeltaTime, ELevelTick 
 	}
 }
 
-void UGioStateMachineRunnerComponent::RunStateMachine(TSubclassOf<UGioStateMachine> Class)
+void UGioStateMachineRunnerComponent::CreateAndRunStateMachine(TSubclassOf<UGioStateMachine> Class)
 {
-	StateMachine = NewObject<UGioStateMachine>(this, Class);
-	checkf(StateMachine, TEXT("%s's 'CreateStateMachine' function did not create a valid state machine. Make sure to set the StateMachineClass"), *GetNameSafe(GetOwner()))
-	StateMachine->EnterViaFirstInput();
+	CreateStateMachine(Class);
+	RunStateMachine();
 }

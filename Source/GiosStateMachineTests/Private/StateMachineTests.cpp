@@ -53,7 +53,7 @@ BEGIN_DEFINE_SPEC(FStateMachineTests, TEXT("GioStateMachine"),
 
 		if (TestNotNull(TEXT("State machine resource is not null"), StateMachineResource))
 		{
-			StateMachineRunner->RunStateMachine(StateMachineResource->GetClass());
+			StateMachineRunner->CreateAndRunStateMachine(StateMachineResource->GetClass());
 			return true;
 		}
 
@@ -269,7 +269,7 @@ void FStateMachineTests::Define()
 
 	It(TEXT("EnterAndExitCallbacksReceived"), [this]
 	{
-		StateMachineRunner->RunStateMachine(UGioStateMachine::StaticClass());
+		StateMachineRunner->CreateAndRunStateMachine(UGioStateMachine::StaticClass());
 		UGioHumbleNode* Node = RunCustomNode<UGioHumbleNode>(UGioHumbleNode::StaticClass());
 
 		if(!TestNotNull(TEXT("Node not null"), Node))
@@ -283,7 +283,7 @@ void FStateMachineTests::Define()
 
 	It(TEXT("ReturnCallbackReceived"), [this]
 		{
-			StateMachineRunner->RunStateMachine(UGioStateMachine::StaticClass());
+			StateMachineRunner->CreateAndRunStateMachine(UGioStateMachine::StaticClass());
 			UGioHumbleNode* First = RunCustomNode<UGioHumbleNode>(UGioHumbleNode::StaticClass());
 
 			if(!First)

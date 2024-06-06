@@ -57,7 +57,9 @@ void UGioStateMachine::EnterNewNode(UClass* NodeClass, FName Input, FString Node
 
 UGioStateMachineData* UGioStateMachine::CreateData()
 {
-	return NewObject<UGioStateMachineData>(this, DataType);
+	UGioStateMachineData* NewData = NewObject<UGioStateMachineData>(this, DataType);
+	DataCreated.Broadcast(NewData);
+	return NewData;
 }
 
 void UGioStateMachine::SetCurrentActivation(const FGioStateActivation& Activation)
